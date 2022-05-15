@@ -50,8 +50,8 @@ export default function Home() {
   return <>
     <div className="main-bg fixed top-0 bottom-0 left-0 right-0 text-center bg-center bg-no-repeat bg-cover -z-10 text-white" style={{ backgroundImage: "url(" + bg + ")" }}>
       {sentence.time && <div className='fixed right-0 bottom-0 w-full md:w-fit bg-black/30 text-white px-5 py-2'>
-        <div className='text-left'>{sentence.content}</div>
-        <div className='text-right'>——{sentence.trans}</div>
+        <div className='text-left text-white'>{sentence.content}</div>
+        <div className='text-right text-white'>——{sentence.trans}</div>
       </div>}
     </div>
   </>
