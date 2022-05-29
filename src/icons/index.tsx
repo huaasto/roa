@@ -9,6 +9,13 @@ type Prop = {
 }
 
 
+
+export const IAdd = (props: Prop) => (
+  <svg viewBox="0 0 24 24" {...props}>
+    <path fill="none" strokeWidth="2" d="M12 22V2M2 12h20"></path>
+  </svg>
+)
+
 export const IAggregate = (props: Prop) => (
   <svg viewBox="0 0 24 24" {...props}>
     <path fill="none" strokeWidth="2" d="M8 15h7V8a7 7 0 1 0-7 7zm8-6H9v7a7 7 0 1 0 7-7z"></path>

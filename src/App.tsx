@@ -1,5 +1,5 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom'
+import React, { useCallback, useEffect, useReducer } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom'
 
 import Home from './pages/Home';
 import Blogs from './pages/Blogs';
@@ -8,19 +8,56 @@ import Links from './pages/Links';
 import Demos from './pages/Demos';
 import AboutMe from './pages/AboutMe';
 import Nav from './components/Nav';
+import { Context, initialState, reducer } from './content';
+import { githubQuery, parseQuery } from './utils/common';
 
 function App() {
-  return <>
-    <Nav />
+  const location = useLocation()
+  const [state, dispatch] = useReducer(reducer, initialState)
 
-    <Routes>
-      <Route path="/" element={<Home />}></Route>
-      <Route path="/blogs" element={<Blogs />}></Route>
-      <Route path="/images" element={<Images />}></Route>
-      <Route path="/links" element={<Links />}></Route>
-      <Route path="/demos" element={<Demos />}></Route>
-      <Route path="/about-me" element={<AboutMe />}></Route>
-    </Routes>
+  const fetchData = useCallback(async () => {
+    const query = parseQuery(location.search)
+    if (!query.code && !localStorage.authorization) {
+      window.location.href = "https://github.com/login/oauth/authorize?scope=public_repo%20user&client_id=" + process.env.REACT_APP_CLIENT_ID
+    } else if (!localStorage.authorization) {
+      const res = await githubQuery({
+        url: "https://github.com/login/oauth/access_token",
+        data: {
+          client_id: process.env.REACT_APP_CLIENT_ID || '',
+          client_secret: process.env.REACT_APP_CLIENT_SECRET || '',
+          code: query.code
+        }
+      });
+      res.data?.access_token && localStorage.setItem("authorization", 'token ' + res.data?.access_token)
+    }
+    localStorage.authorization && dispatch({ type: "update", value: { authorization: localStorage.authorization } })
+    githubQuery({ url: '/user' }).then(res => {
+      res.data && dispatch({ type: "update", value: { userInfo: res.data } })
+    }).catch(err => {
+      if (err.code === 401) {
+        window.localStorage.removeItem("authorization")
+        window.location.href = "https://github.com/login/oauth/authorize?scope=public_repo%20user&client_id=" + process.env.REACT_APP_CLIENT_ID
+      }
+    })
+  }, [location.search])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+  return <>
+    <Context.Provider value={{ state, dispatch }}>
+      <Nav />
+
+      <Routes>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/blogs" element={<Blogs />}></Route>
+        <Route path="/images" element={<Images />}></Route>
+        <Route path="/links" element={<Links />}></Route>
+        <Route path="/demos" element={<Demos />}></Route>
+        <Route path="/about-me" element={<AboutMe />}></Route>
+      </Routes>
+    </Context.Provider>
+
   </>
 }
 
