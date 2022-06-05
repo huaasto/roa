@@ -2,6 +2,7 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
 import { IAdd } from "../../icons"
 import Compressor from 'compressorjs';
 import { Format, githubQuery } from "../../utils/common";
+import "./index.css"
 
 type CompressorOption = {
   quality: number,
@@ -214,13 +215,15 @@ export default function Images() {
         <button className="absolute bottom-3 right-3 bg-black text-white px-4" disabled={loading} onClick={startUpload}>Upload-{current}/{total}</button>
       </div>
       <input ref={fileRef} type="file" multiple accept="image/*" disabled={loading} className="hidden" onChange={queryImages} />
-      <div className=" max-w-6xl m-auto">
+      <div className=" max-w-6xl m-auto overflow-x-hidden">
         {imgDates.map((date, i) => <div key={date.sha} className="my-2">
           <div>
-            <span className="inline-block bg-black text-white px-5 py-2 cursor-pointer"
-              onClick={(e) => toggleFold(i)}>
-              {date.name}
-            </span>
+            <div className={"relative date-davider" + (i % 2 ? " text-right" : '')}>
+              <span className="inline-block bg-black text-white px-5 py-2 cursor-pointer"
+                onClick={(e) => toggleFold(i)}>
+                {date.name}
+              </span>
+            </div>
             {<div className={date.fold ? " hidden" : " block"}>
               {datesImages[date.name]?.map((img, j) => <div key={img.sha + img.name} className="inline-block h-20 m-2 relative">
                 <img className=" h-full" src={img.download_url} alt="" />
