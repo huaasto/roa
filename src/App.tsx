@@ -17,9 +17,7 @@ function App() {
 
   const fetchData = useCallback(async () => {
     const query = parseQuery(location.search)
-    if (!query.code && !localStorage.authorization) {
-      window.location.href = "https://github.com/login/oauth/authorize?scope=public_repo%20user&client_id=" + process.env.REACT_APP_CLIENT_ID
-    } else if (!localStorage.authorization) {
+    if (query.code && !localStorage.authorization) {
       const res = await githubQuery({
         url: "https://github.com/login/oauth/access_token",
         data: {
@@ -36,7 +34,8 @@ function App() {
     }).catch(err => {
       if (err.code === 401) {
         window.localStorage.removeItem("authorization")
-        window.location.href = "https://github.com/login/oauth/authorize?scope=public_repo%20user&client_id=" + process.env.REACT_APP_CLIENT_ID
+        // alert("未连接到Github")
+        window.location.href = "https://github.com/login/oauth/authorize?client_id=" + process.env.REACT_APP_CLIENT_ID
       }
     })
   }, [location.search])

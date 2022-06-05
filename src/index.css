@@ -20,3 +20,21 @@ svg {
   display: inline-block;
   cursor: pointer;
 }
+
+.no-scroll::-webkit-scrollbar{
+  display: none;
+}
+
+.disabled{
+  position: relative;
+  pointer-events: none;
+}
+.disabled:after{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+}

@@ -9,7 +9,7 @@ export default function Nav() {
     setArea(route.pathname.split('/')[1])
   }, [area, route])
   return <>
-    <div className='fixed top-0 left-0 right-0 bg-black/75 rounded-b-2xl w-fit m-auto border-round px-5 text-center'>
+    <div className='fixed top-0 left-0 right-0 bg-black/75 rounded-b-2xl w-fit m-auto border-round px-5 text-center z-40'>
       <Link to="/">
         <IHome className="m-2 hover:stroke-green-300" width="30" stroke={area ? '#fff' : '#86efac'} />
       </Link>
