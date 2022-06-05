@@ -75,6 +75,6 @@ export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {} 
           reject({ error: 0 })
         }
         resolve(data)
-      }).catch(err => reject(err))
+      }).catch(err => reject({ code: 500, msg: "服务器错误" }))
   }) as Promise<any>
 }
