@@ -32,6 +32,7 @@ function App() {
     githubQuery({ url: '/user' }).then(res => {
       res.data && dispatch({ type: "update", value: { userInfo: res.data } })
     }).catch(err => {
+      console.log(err)
       if (err.code === 401 || err.code === 500) {
         window.localStorage.removeItem("authorization")
         // alert("未连接到Github")

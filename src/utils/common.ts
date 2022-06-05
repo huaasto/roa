@@ -65,7 +65,6 @@ export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {} 
           data
         })
       }).then(res => {
-        console.log()
         if (res.status === 401 || res.status === 502) {
           // token失效
           reject({ code: 401, msg: "token is expired!!" })
