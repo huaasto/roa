@@ -226,7 +226,7 @@ export default function Images() {
             </div>
             {<div className={date.fold ? " hidden" : " block"}>
               {datesImages[date.name]?.map((img, j) => <div key={img.sha + img.name} className="inline-block h-20 m-2 relative">
-                <img className=" h-full" src={img.download_url} alt="" />
+                <img className=" h-full" src={img.pic_url} alt="" />
                 <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, img, i)}>×</div>
               </div>)}
             </div>}
