@@ -1,5 +1,5 @@
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
-import { IAdd } from "../../icons"
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { IAdd, ITrash } from "../../icons"
 import Compressor from 'compressorjs';
 import { Format, githubQuery } from "../../utils/common";
 import "./index.css"
@@ -14,14 +14,22 @@ type Date = {
   path: string,
   download_url?: string,
   pic_url?: string,
-  fold?: boolean
+  fold?: boolean,
+  content?: string,
+  proSha?: string
 }
 type DatesObj = {
   [key: string]: Date[]
 }
 
 
+
+
 export default function Images() {
+  const [showBg, setShowBg] = useState(false)
+  const [currentInd, setCurrentInd] = useState(0)
+  const [currentDate, setCurrentDate] = useState('')
+  const [currentImgs, setCurrentImgs] = useState<Date[]>([])
   const fileRef = useRef<HTMLInputElement | null>(null)
   const [total, setTotal] = useState(0)
   const [current, setCurrent] = useState(0)
@@ -53,7 +61,7 @@ export default function Images() {
 
       let properImage: File
       if (!image.type.match('gif')) {
-        properImage = await myCompressor(image, { quality: 0.8 })
+        properImage = (600 * 1024) / image.size > 1 ? await myCompressor(image, { quality: +((600 * 1024) / image.size / 2).toFixed(1) }) : image
       } else {
         properImage = image
       }
@@ -131,16 +139,34 @@ export default function Images() {
     setTotal(total - 1)
   }
 
+  const queryOneImgs = async (imgs: DatesObj, date: string, name: string, i: number) => {
+    const res = await githubQuery({
+      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + name,
+      method: "GET",
+    })
+    imgs[date][i].content = res.data.content ? 'data:image/' + res.data.name.split('.').reverse()[0] + ';base64,' + res.data.content : ''
+    imgs[date][i].proSha = res.data.sha
+    return imgs[date][i]
+  }
+
   const queryOneDayImgs = useCallback(async (dates: string) => {
     const res = await githubQuery({
       url: "https://api.github.com/repos/huaasto/empty/contents/mini/" + dates,
       method: "GET",
     })
     const imgs = { ...datesImages }
-    imgs[dates] = res.data.map((img: Date) => Object.assign(img, {
-      pic_url: img.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master')
-    })).reverse()
+    const imgData = res.data.map((img: Date) => Object.assign(img, {
+      pic_url: img.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master'),
+    })
+    ).reverse()
+    imgs[dates] = imgs[dates]?.map(img => Object.assign({}, imgs[dates], imgData)) || imgData
     setDatesImages(imgs)
+    Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
+      const realImgs = JSON.parse(JSON.stringify(imgs))
+      setDatesImages(realImgs)
+    })
+
+
   }, [datesImages])
 
   const queryDates = async () => {
@@ -173,10 +199,10 @@ export default function Images() {
     initFile()
     alert("已全部上传")
   }
-  const removeCurrentPic = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>, img: Date, i: number) => {
+  const removeCurrentPic = async (e: any, date: string, img: Date) => {
     e.stopPropagation()
     const res = githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/mini/" + imgDates[i].name + '/' + img.name,
+      url: "https://api.github.com/repos/huaasto/empty/contents/mini/" + date + '/' + img.name,
       method: "DELETE",
       data: {
         sha: img.sha,
@@ -184,20 +210,35 @@ export default function Images() {
       }
     })
     const data = await githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + imgDates[i].name + '/' + img.name,
+      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
       method: "GET",
     })
     githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + imgDates[i].name + '/' + img.name,
+      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
       method: "DELETE",
       data: {
         sha: data.data.sha,
         message: "delete img"
       }
     })
-    queryOneDayImgs(imgDates[i].name)
+    setShowBg(false)
+    const imgs = JSON.parse(JSON.stringify(datesImages))
+    imgs[date].splice(currentInd, 1)
+    setDatesImages(imgs)
     alert("删除成功")
   }
+  const parseImg = (pic: Date) => {
+    return (pic.content || pic.pic_url) || ''
+  }
+  const queryCurrentImgs = (date: string, i: number) => {
+    setCurrentInd(i)
+    setCurrentDate(date)
+    setCurrentImgs([...datesImages[date]])
+    setShowBg(true)
+  }
+  useEffect(() => {
+    console.log(datesImages)
+  }, [datesImages])
   useEffect(() => {
     queryDates()
   }, [])
@@ -226,13 +267,26 @@ export default function Images() {
             </div>
             {<div className={date.fold ? " hidden" : " block"}>
               {datesImages[date.name]?.map((img, j) => <div key={img.sha + img.name} className="inline-block h-20 m-2 relative">
-                <img className=" h-full" src={img.download_url} alt="" />
-                <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, img, i)}>×</div>
+                <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={parseImg(img)} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
+                {/* {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>} */}
               </div>)}
             </div>}
           </div>
         </div>)}
       </div>
+      {showBg && <div className="imgBg fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+        <div className="fixed left-0 top-0 text-white p-2 text-3xl  cursor-pointer">
+          <span onClick={(e) => removeCurrentPic(e, currentDate, currentImgs[currentInd])}>
+            <ITrash stroke="#fff" width="28" className="mr-4 align-baseline" />
+          </span>
+
+          <span>{currentDate}</span>
+        </div>
+        <div className="fixed right-0 top-0 text-white p-2 text-3xl  cursor-pointer" onClick={() => setShowBg(false)}>×</div>
+        <img src={parseImg(currentImgs[currentInd])} className="max-h-full max-w-full" alt="" />
+        <div className="fixed left-4 top-1/2 bottom-1/2 text-white m-auto text-3xl cursor-pointer min-h-fit min-w-fit p-2 bg-black rounded-md" onClick={() => setCurrentInd(currentInd !== 0 ? currentInd - 1 : currentImgs.length - 1)}>&lt;</div>
+        <div className="fixed right-4 top-1/2 bottom-1/2 text-white m-auto text-3xl cursor-pointer  min-h-fit min-w-fit p-2 bg-black rounded-md" onClick={() => setCurrentInd(currentInd !== currentImgs.length - 1 ? currentInd + 1 : 0)}>&gt;</div>
+      </div>}
     </>
   )
 }

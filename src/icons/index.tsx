@@ -64,5 +64,10 @@ export const IRun = (props: Prop) => (
   </svg>
 )
 
+export const ITrash = (props: Prop) => (
+  <svg viewBox="0 0 24 24" {...props}>
+    <path fill="none" strokeWidth="2" d="M4 5h16v18H4V5zM1 5h22M9 1h6v4H9V1zm0 0h6v4H9V1zm6 8v10M9 9v10"></path>
+  </svg>
+)
 
 
