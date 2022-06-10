@@ -237,9 +237,6 @@ export default function Images() {
     setShowBg(true)
   }
   useEffect(() => {
-    console.log(datesImages)
-  }, [datesImages])
-  useEffect(() => {
     queryDates()
   }, [])
   return (
@@ -259,7 +256,7 @@ export default function Images() {
       <div className=" max-w-6xl m-auto overflow-x-hidden">
         {imgDates.map((date, i) => <div key={date.sha} className="my-2">
           <div>
-            <div className={"relative date-davider" + (i % 2 ? " text-right" : '')}>
+            <div className={"relative date-davider" + (i % 2 ? " text-right  border-l-stone-300 border-l-2" : ' border-r-stone-300 border-r-2')}>
               <span className="inline-block bg-black text-white px-5 py-2 cursor-pointer"
                 onClick={(e) => toggleFold(i)}>
                 {date.name}
