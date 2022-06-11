@@ -61,7 +61,7 @@ export default function Home() {
 
   return <>
     <div className="main-bg fixed top-0 bottom-0 left-0 right-0 text-center bg-center bg-no-repeat bg-cover -z-10 text-white" style={{ backgroundImage: "url(" + bg + ")" }}>
-      <div className='flex items-center fixed right-0 bottom-0 w-full md:w-fit bg-black/30 text-white px-5 py-2' style={{ color: "#fff" }}>
+      <div className='flex items-center justify-between fixed right-0 bottom-0 w-full md:w-fit bg-black/30 text-white px-5 py-2' style={{ color: "#fff" }}>
         {sentence.time && <div>
           <div className='text-left'>{sentence.content}</div>
           <div className='text-right'>——{sentence.trans}</div>
