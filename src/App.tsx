@@ -32,11 +32,12 @@ function App() {
     githubQuery({ url: '/user' }).then(res => {
       res.data && dispatch({ type: "update", value: { userInfo: res.data } })
     }).catch(err => {
-      if (err.code === 401 || err.code === 500) {
-        window.localStorage.removeItem("authorization")
-        // alert("未连接到Github")
-        window.location.href = "https://github.com/login/oauth/authorize?scope=repo&client_id=" + process.env.REACT_APP_CLIENT_ID
-      }
+      alert('暂未登录，当前为游客权限')
+      // if (err.code === 401 || err.code === 500) {
+      //   window.localStorage.removeItem("authorization")
+      //   // alert("未连接到Github")
+      //   window.location.href = "https://github.com/login/oauth/authorize?scope=repo&client_id=" + process.env.REACT_APP_CLIENT_ID
+      // }
     })
   }, [location.search])
 

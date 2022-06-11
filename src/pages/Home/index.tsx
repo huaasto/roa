@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { Context } from '../../content'
+import { IGithub, IRun } from '../../icons'
 import { Format } from '../../utils/common'
 
 
 
 export default function Home() {
+  const { state, dispatch } = useContext(Context)
   const [bg, setBg] = React.useState('')
   const [sentence, setSentence] = useState({
     id: "",
@@ -26,6 +29,15 @@ export default function Home() {
         setBg('https://source.unsplash.com/random/' + (window.innerWidth > 769 ? '1920x1080' : '750x1334'))
     }
   }, [])
+  const logout = () => {
+    window.localStorage.removeItem("authorization")
+    dispatch({ type: "update", value: { userInfo: {} } })
+  }
+  const login = () => {
+    window.localStorage.removeItem("authorization")
+    // alert("未连接到Github")
+    window.location.href = "https://github.com/login/oauth/authorize?scope=repo&client_id=" + process.env.REACT_APP_CLIENT_ID
+  }
   useEffect(() => {
     fetch('/api/proxy',
       {
@@ -49,10 +61,19 @@ export default function Home() {
 
   return <>
     <div className="main-bg fixed top-0 bottom-0 left-0 right-0 text-center bg-center bg-no-repeat bg-cover -z-10 text-white" style={{ backgroundImage: "url(" + bg + ")" }}>
-      {sentence.time && <div className='fixed right-0 bottom-0 w-full md:w-fit bg-black/30 text-white px-5 py-2' style={{ color: "#fff" }}>
-        <div className='text-left'>{sentence.content}</div>
-        <div className='text-right'>——{sentence.trans}</div>
-      </div>}
+      <div className='flex items-center fixed right-0 bottom-0 w-full md:w-fit bg-black/30 text-white px-5 py-2' style={{ color: "#fff" }}>
+        {sentence.time && <div>
+          <div className='text-left'>{sentence.content}</div>
+          <div className='text-right'>——{sentence.trans}</div>
+        </div>}
+        <div className='shadow-white shadow-inner'>
+          {state?.userInfo?.login
+            ? <span onClick={logout}><IRun width="32" stroke='#000' /></span>
+            : <span onClick={login}><IGithub width="32" stroke='#000' /></span>
+          }
+        </div>
+
+      </div>
     </div>
   </>
 
