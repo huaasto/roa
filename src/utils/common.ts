@@ -15,7 +15,7 @@ export const Format = function (time: Date, fmt = "YYYY-MM-DD") {
 }
 
 type TRandomObj = {
-  [key: string]: string
+  [key: string]: any
 }
 
 export const parseQuery = (query: string) => {
@@ -28,7 +28,7 @@ export const parseQuery = (query: string) => {
   return result
 }
 
-export const query = ({ url = "", method = "GET", headers = {}, data = {} }: { url?: string, method?: string, headers?: TRandomObj, data?: TRandomObj }) => {
+export const query = ({ url = "", method = "GET", headers = {}, data = {}, type = 'json' }: { url?: string, method?: string, headers?: TRandomObj, data?: TRandomObj, type?: string }) => {
   return new Promise((resolve, reject) => {
     fetch('/api/proxy',
       {
@@ -40,7 +40,11 @@ export const query = ({ url = "", method = "GET", headers = {}, data = {} }: { u
           data
         })
       }).then(res => {
-        return res.json()
+        if (type === 'json') {
+          return res.json()
+        } else {
+          return res.text()
+        }
       }).then(data => {
         if (!data) {
           reject({ error: 0 })
@@ -50,7 +54,7 @@ export const query = ({ url = "", method = "GET", headers = {}, data = {} }: { u
   })
 }
 
-export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {} }: { url?: string, method?: string, headers?: TRandomObj, data?: TRandomObj }) => {
+export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {}, type = 'json' }: { url?: string, method?: string, headers?: TRandomObj, data?: TRandomObj, type?: string }) => {
   return new Promise((resolve, reject) => {
     fetch('/api/proxy',
       {
@@ -62,14 +66,19 @@ export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {} 
             Authorization: localStorage.authorization,
             accept: "application/vnd.github.v3+json"
           }),
-          data
+          [method.toLocaleUpperCase() === 'GET' ? 'params' : 'data']: data
         })
       }).then(res => {
         if (res.status === 401 || res.status === 502) {
           // token失效
           reject({ code: 401, msg: "token is expired!!" })
         }
-        return res.json()
+        if (type === 'json') {
+          return res.json()
+        } else {
+          return res.text()
+        }
+        // return { json: res.json, text: res.text }[type]()
       }).then(data => {
         if (!data) {
           reject({ error: 0 })

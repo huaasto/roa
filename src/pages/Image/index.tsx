@@ -1,8 +1,9 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { IAdd, ITrash } from "../../icons"
 import Compressor from 'compressorjs';
 import { Format, githubQuery } from "../../utils/common";
 import "./index.css"
+import { Context } from "../../content";
 
 type CompressorOption = {
   quality: number,
@@ -15,8 +16,10 @@ type Date = {
   download_url?: string,
   pic_url?: string,
   fold?: boolean,
+  size?: number,
   content?: string,
-  proSha?: string
+  proSha?: string,
+  proUrl?: string
 }
 type DatesObj = {
   [key: string]: Date[]
@@ -26,6 +29,7 @@ type DatesObj = {
 
 
 export default function Images() {
+  const { state } = useContext(Context)
   const [showBg, setShowBg] = useState(false)
   const [currentInd, setCurrentInd] = useState(0)
   const [currentDate, setCurrentDate] = useState('')
@@ -146,6 +150,7 @@ export default function Images() {
     })
     imgs[date][i].content = res.data.content ? 'data:image/' + res.data.name.split('.').reverse()[0] + ';base64,' + res.data.content : ''
     imgs[date][i].proSha = res.data.sha
+    imgs[date][i].proUrl = res.data.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master')
     return imgs[date][i]
   }
 
@@ -228,7 +233,7 @@ export default function Images() {
     alert("删除成功")
   }
   const parseImg = (pic: Date) => {
-    return (pic.content || pic.pic_url) || ''
+    return (pic.size && pic.size > 1024 * 600 ? (pic.content || pic.proUrl || pic.pic_url) : (pic.content || pic.pic_url)) || ''
   }
   const queryCurrentImgs = (date: string, i: number) => {
     setCurrentInd(i)
@@ -241,7 +246,7 @@ export default function Images() {
   }, [])
   return (
     <>
-      <div className={"border-2 border-gray-600 border-dashed max-w-screen-md px-3 py-6 mx-auto my-4 rounded text-center relative" + (loading ? ' disabled' : '')} onClick={() => fileRef.current?.click()}>
+      {state?.userInfo?.login === "huaasto" && <div className={"border-2 border-gray-600 border-dashed max-w-screen-md px-3 py-6 mx-auto my-4 rounded text-center relative" + (loading ? ' disabled' : '')} onClick={() => fileRef.current?.click()}>
         <IAdd width="50" stroke="#000" />
         <div className=" max-h-40 overflow-auto no-scroll">
           {miniFiles.map((image, i) => <span key={i} className="relative inline-block">
@@ -251,7 +256,7 @@ export default function Images() {
           )}
         </div>
         <button className="absolute bottom-3 right-3 bg-black text-white px-4" disabled={loading} onClick={startUpload}>Upload-{current}/{total}</button>
-      </div>
+      </div>}
       <input ref={fileRef} type="file" multiple accept="image/*" disabled={loading} className="hidden" onChange={queryImages} />
       <div className=" max-w-6xl m-auto overflow-x-hidden">
         {imgDates.map((date, i) => <div key={date.sha} className="my-2">
@@ -273,9 +278,9 @@ export default function Images() {
       </div>
       {showBg && <div className="imgBg fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
         <div className="fixed left-0 top-0 text-white p-2 text-3xl  cursor-pointer">
-          <span onClick={(e) => removeCurrentPic(e, currentDate, currentImgs[currentInd])}>
+          {state?.userInfo?.login === "huaasto" && <span onClick={(e) => removeCurrentPic(e, currentDate, currentImgs[currentInd])}>
             <ITrash stroke="#fff" width="28" className="mr-4 align-baseline" />
-          </span>
+          </span>}
 
           <span>{currentDate}</span>
         </div>
