@@ -62,10 +62,10 @@ export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {},
         body: JSON.stringify({
           url: url.includes('https') ? url : 'https://api.github.com' + url,
           method,
-          headers: Object.assign(headers, {
+          headers: Object.assign({}, {
             Authorization: localStorage.authorization,
             accept: "application/vnd.github.v3+json"
-          }),
+          }, headers),
           [method.toLocaleUpperCase() === 'GET' ? 'params' : 'data']: data
         })
       }).then(res => {
