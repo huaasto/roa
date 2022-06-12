@@ -81,15 +81,18 @@ export default function Images() {
       }
       // readermini.onload = async function (ev) {
       var dataURL = image.url.split(',')[1] //获得文件读取成功后的DataURL,也就是base64编码
-      const data = await githubQuery({
-        url: "https://api.github.com/repos/huaasto/empty/contents/mini/" + par.path + '/' + par.name,
-        // url: "https://github.com/repos/huaasto/minipics/contents/" + par.path + '/' + par.name,
-        method: "PUT",
-        data: {
-          content: dataURL,
-          message: 'create mini img'
-        }
-      })
+      if (!isPublic) {
+
+        const data = await githubQuery({
+          url: "https://api.github.com/repos/huaasto/empty/contents/mini/" + par.path + '/' + par.name,
+          // url: "https://github.com/repos/huaasto/minipics/contents/" + par.path + '/' + par.name,
+          method: "PUT",
+          data: {
+            content: dataURL,
+            message: 'create mini img'
+          }
+        })
+      }
       reader.readAsDataURL(properImage) //将文件读取为 DataURL,也就是base64编码
       // }
 
@@ -97,7 +100,7 @@ export default function Images() {
         if (typeof ev?.target?.result !== 'string') return
         var dataURL = ev.target.result.split(',')[1] //获得文件读取成功后的DataURL,也就是base64编码
         const data = await githubQuery({
-          url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + par.path + '/' + par.name,
+          url: (isPublic ? 'https://api.github.com/repos/huaasto/empty/contents/public/' : "https://api.github.com/repos/huaasto/empty/contents/pro/") + par.path + '/' + par.name,
           method: "PUT",
           data: {
             content: dataURL,
@@ -107,7 +110,7 @@ export default function Images() {
         resolve(data)
       }
     })
-  }, [])
+  }, [isPublic])
   const queryImages = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
     setMiniFiles([])
@@ -161,13 +164,14 @@ export default function Images() {
       method: "GET",
     })
     const imgs = { ...datesImages }
-    const imgData = res.data.map((img: Date) => Object.assign(img, {
+    const imgData = res.data.map((img: Date, i: number) => Object.assign(imgs[dates]?.[imgs[dates].length - i - 1] || {}, img, {
       pic_url: img.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master'),
     })
     ).reverse()
-    imgs[dates] = imgs[dates]?.map(img => Object.assign({}, imgs[dates], imgData)) || imgData
+    imgs[dates] = imgData
+    console.log(imgs)
     setDatesImages(imgs)
-    isPublic || Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
+    isPublic || Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' || img.proUrl ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
       const realImgs = JSON.parse(JSON.stringify(imgs))
       setDatesImages(realImgs)
     })
@@ -193,10 +197,12 @@ export default function Images() {
     e.stopPropagation()
     if (!fileRef.current?.files?.length) return
     setLoading(true)
+    const newImgs = []
     for (let i = 0; i < miniFiles.length; i++) {
       setCurrent(i + 1)
       const pic = miniFiles[i]
-      await uploader(pic as File & { url: string; })
+      const newImg: any = await uploader(pic as File & { url: string; })
+      newImg.status === 201 && newImgs.push(Object.assign({}, newImg.data.content, {}))
     }
     queryDates()
     queryOneDayImgs(Format(new Date(), 'YYYY_MM_DD'))
@@ -206,25 +212,28 @@ export default function Images() {
   const removeCurrentPic = async (e: any, date: string, img: Date) => {
     e.stopPropagation()
     const res = githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/mini/" + date + '/' + img.name,
+      url: (isPublic ? 'https://api.github.com/repos/huaasto/empty/contents/public/' : "https://api.github.com/repos/huaasto/empty/contents/mini/") + date + '/' + img.name,
       method: "DELETE",
       data: {
         sha: img.sha,
         message: "delete mini img"
       }
     })
-    const data = await githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
-      method: "GET",
-    })
-    githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
-      method: "DELETE",
-      data: {
-        sha: data.data.sha,
-        message: "delete img"
-      }
-    })
+    if (!isPublic) {
+      const data = await githubQuery({
+        url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
+        method: "GET",
+      })
+      githubQuery({
+        url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
+        method: "DELETE",
+        data: {
+          sha: data.data.sha,
+          message: "delete img"
+        }
+      })
+    }
+
     setShowBg(false)
     const imgs = JSON.parse(JSON.stringify(datesImages))
     imgs[date].splice(currentInd, 1)
@@ -242,6 +251,7 @@ export default function Images() {
   }
   useEffect(() => {
     queryDates()
+    setDatesImages({})
   }, [isPublic])
   return (
     <>
@@ -257,7 +267,7 @@ export default function Images() {
         <button className="absolute bottom-3 right-3 bg-black text-white px-4" disabled={loading} onClick={startUpload}>Upload-{current}/{total}</button>
       </div>
       {state?.userInfo?.login === "huaasto" && <>
-        <button className={"py-1 px-3 border border-black" + (isPublic ? ' bg-black text-white' : '')} onClick={() => setIsPublic(true)}>共有</button>
+        <button className={"py-1 px-3 border border-black" + (isPublic ? ' bg-black text-white' : '')} onClick={() => setIsPublic(true)}>公共</button>
         <button className={"py-1 px-3 border border-black" + (isPublic ? '' : ' bg-black text-white')} onClick={() => setIsPublic(false)}>私有</button>
       </>}
       <input ref={fileRef} type="file" multiple accept="image/*" disabled={loading} className="hidden" onChange={queryImages} />
@@ -271,7 +281,7 @@ export default function Images() {
               </span>
             </div>
             {<div className={date.fold ? " hidden" : " block"}>
-              {datesImages[date.name]?.map((img, j) => <div key={img.sha + img.name} className="inline-block h-20 m-2 relative">
+              {datesImages[date.name]?.map((img, j) => <div key={'pp_' + j} className="inline-block h-20 m-2 relative">
                 <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={parseImg(img)} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
                 {/* {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>} */}
               </div>)}
