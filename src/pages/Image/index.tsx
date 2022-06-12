@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } from "react"
-import { IAdd, ITrash } from "../../icons"
+import { IAdd, ILinks, ITrash } from "../../icons"
 import Compressor from 'compressorjs';
 import { Format, githubQuery } from "../../utils/common";
 import "./index.css"
@@ -249,6 +249,18 @@ export default function Images() {
     setCurrentImgs([...datesImages[date]])
     setShowBg(true)
   }
+  const copyLink = (img: Date) => {
+    var textareaC = document.createElement('textarea');
+    textareaC.setAttribute('readonly', 'readonly'); //设置只读属性防止手机上弹出软键盘
+    textareaC.value = img.proUrl || img.pic_url || img.download_url || '';
+    document.body.appendChild(textareaC); //将textarea添加为body子元素
+    textareaC.select();
+    var res = document.execCommand('copy');
+    document.body.removeChild(textareaC);//移除DOM元素
+    console.log(img)
+    alert("复制成功");
+    return res;
+  }
   useEffect(() => {
     queryDates()
     setDatesImages({})
@@ -266,10 +278,10 @@ export default function Images() {
         </div>
         <button className="absolute bottom-3 right-3 bg-black text-white px-4" disabled={loading} onClick={startUpload}>Upload-{current}/{total}</button>
       </div>
-      {state?.userInfo?.login === "huaasto" && <>
+      {state?.userInfo?.login === "huaasto" && <div className="text-right">
         <button className={"py-1 px-3 border border-black" + (isPublic ? ' bg-black text-white' : '')} onClick={() => setIsPublic(true)}>公共</button>
         <button className={"py-1 px-3 border border-black" + (isPublic ? '' : ' bg-black text-white')} onClick={() => setIsPublic(false)}>私有</button>
-      </>}
+      </div>}
       <input ref={fileRef} type="file" multiple accept="image/*" disabled={loading} className="hidden" onChange={queryImages} />
       <div className=" max-w-6xl m-auto overflow-x-hidden">
         {imgDates.map((date, i) => <div key={date.sha} className="my-2">
@@ -296,6 +308,9 @@ export default function Images() {
           </span>}
 
           <span>{currentDate}</span>
+          <span onClick={() => copyLink(currentImgs[currentInd])}>
+            <ILinks stroke="#fff" width="28" className="ml-4 align-baseline" />
+          </span>
         </div>
         <div className="fixed right-0 top-0 text-white p-2 text-3xl  cursor-pointer" onClick={() => setShowBg(false)}>×</div>
         <img src={parseImg(currentImgs[currentInd])} className="max-h-full max-w-full" alt="" />

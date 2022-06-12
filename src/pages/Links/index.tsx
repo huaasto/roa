@@ -118,6 +118,9 @@ export default function Links() {
   }
   return (<>
     <div className="flex flex-wrap mt-10 justify-start max-w-5xl m-auto">
+      {state?.userInfo?.login === "huaasto" && <div className="w-full sm:w-fit h-fit border-2 border-gray-600 border-dashed p-3 m-4 rounded text-center" onClick={() => setShowBg(true)}>
+        <IAdd width="56" stroke="#000" />
+      </div>}
       {
         datas.map(link => <div key={link.sha} className="w-full max-w-full overflow-hidden sm:flex h-fit border-2 border-gray-600 border-dashed p-3 m-4 rounded text-center box-border flex-1 sm:basis-2/5 min-w-300 items-center">
           {!link.img
@@ -139,9 +142,7 @@ export default function Links() {
         </div>)
       }
 
-      {state?.userInfo?.login === "huaasto" && <div className="w-full sm:w-fit h-fit border-2 border-gray-600 border-dashed p-3 m-4 rounded text-center" onClick={() => setShowBg(true)}>
-        <IAdd width="56" stroke="#000" />
-      </div>}
+
     </div>
     {showBg && <div className="imgBg fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-80 flex justify-center items-center z-50 text-white">
 
