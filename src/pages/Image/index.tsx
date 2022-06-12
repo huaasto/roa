@@ -105,6 +105,9 @@ export default function Images() {
           data: {
             content: dataURL,
             message: 'create img'
+          },
+          headers: {
+            authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==')
           }
         })
         resolve(data)
