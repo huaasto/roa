@@ -6,7 +6,7 @@ import Blogs from './pages/Blogs';
 import Images from './pages/Image';
 import Links from './pages/Links';
 import Demos from './pages/Demos';
-import AboutMe from './pages/AboutMe';
+import AboutMe from './pages/About';
 import Nav from './components/Nav';
 import { Context, initialState, reducer } from './content';
 import { githubQuery, parseQuery } from './utils/common';
@@ -54,7 +54,7 @@ function App() {
         <Route path="/images" element={<Images />}></Route>
         <Route path="/links" element={<Links />}></Route>
         <Route path="/demos" element={<Demos />}></Route>
-        <Route path="/about-me" element={<AboutMe />}></Route>
+        <Route path="/about" element={<AboutMe />}></Route>
       </Routes>
     </Context.Provider>
 

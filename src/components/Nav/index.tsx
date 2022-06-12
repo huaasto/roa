@@ -25,7 +25,7 @@ export default function Nav() {
       <Link to="/demos">
         <ICodepen className="m-2 hover:fill-green-300" width="30" fill={area !== 'demos' ? '#fff' : '#86efac'} />
       </Link>
-      <Link to="/about-me">
+      <Link to="/about">
         <IAggregate className="m-2 hover:stroke-green-300" width="30" stroke={area !== 'about-me' ? '#fff' : '#86efac'} />
       </Link>
     </div>

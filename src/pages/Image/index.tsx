@@ -38,6 +38,7 @@ export default function Images() {
   const [total, setTotal] = useState(0)
   const [current, setCurrent] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [isPublic, setIsPublic] = useState(true)
   const [miniFiles, setMiniFiles] = useState<(File & { url: string; })[]>([])
   // const [currentDate, setCurrentDate] = useState('')
   const [imgDates, setImgDates] = useState<Date[]>([])
@@ -156,7 +157,7 @@ export default function Images() {
 
   const queryOneDayImgs = useCallback(async (dates: string) => {
     const res = await githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/mini/" + dates,
+      url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public/" : "https://api.github.com/repos/huaasto/empty/contents/mini/") + dates,
       method: "GET",
     })
     const imgs = { ...datesImages }
@@ -166,17 +167,15 @@ export default function Images() {
     ).reverse()
     imgs[dates] = imgs[dates]?.map(img => Object.assign({}, imgs[dates], imgData)) || imgData
     setDatesImages(imgs)
-    Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
+    isPublic || Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
       const realImgs = JSON.parse(JSON.stringify(imgs))
       setDatesImages(realImgs)
     })
-
-
-  }, [datesImages])
+  }, [datesImages, isPublic])
 
   const queryDates = async () => {
     const res = await githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/mini",
+      url: isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public" : "https://api.github.com/repos/huaasto/empty/contents/mini",
       method: "GET",
     })
     setImgDates(res.data.map((date: Object, i: number) => Object.assign(date, { fold: imgDates[i]?.fold || true })).reverse())
@@ -243,10 +242,10 @@ export default function Images() {
   }
   useEffect(() => {
     queryDates()
-  }, [])
+  }, [isPublic])
   return (
     <>
-      {state?.userInfo?.login === "huaasto" && <div className={"border-2 border-gray-600 border-dashed max-w-screen-md px-3 py-6 mx-auto my-4 rounded text-center relative" + (loading ? ' disabled' : '')} onClick={() => fileRef.current?.click()}>
+      <div className={"border-2 border-gray-600 border-dashed max-w-screen-md px-3 py-6 mx-auto my-4 rounded text-center relative" + (loading ? ' disabled' : '')} onClick={() => fileRef.current?.click()}>
         <IAdd width="50" stroke="#000" />
         <div className=" max-h-40 overflow-auto no-scroll">
           {miniFiles.map((image, i) => <span key={i} className="relative inline-block">
@@ -256,7 +255,11 @@ export default function Images() {
           )}
         </div>
         <button className="absolute bottom-3 right-3 bg-black text-white px-4" disabled={loading} onClick={startUpload}>Upload-{current}/{total}</button>
-      </div>}
+      </div>
+      {state?.userInfo?.login === "huaasto" && <>
+        <button className={"py-1 px-3 border border-black" + (isPublic ? ' bg-black text-white' : '')} onClick={() => setIsPublic(true)}>共有</button>
+        <button className={"py-1 px-3 border border-black" + (isPublic ? '' : ' bg-black text-white')} onClick={() => setIsPublic(false)}>私有</button>
+      </>}
       <input ref={fileRef} type="file" multiple accept="image/*" disabled={loading} className="hidden" onChange={queryImages} />
       <div className=" max-w-6xl m-auto overflow-x-hidden">
         {imgDates.map((date, i) => <div key={date.sha} className="my-2">
