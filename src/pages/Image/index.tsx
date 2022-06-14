@@ -244,7 +244,7 @@ export default function Images() {
     alert("删除成功")
   }
   const parseImg = (pic: Date) => {
-    return (pic.size && pic.size > 1024 * 600 ? (pic.content || pic.proUrl || pic.pic_url) : (pic.content || pic.pic_url)) || ''
+    return (pic.size && pic.size > 1024 * 600 ? (pic.content || pic.proUrl || pic.pic_url) : (pic.content || pic.proUrl || pic.pic_url)) || ''
   }
   const queryCurrentImgs = (date: string, i: number) => {
     setCurrentInd(i)
