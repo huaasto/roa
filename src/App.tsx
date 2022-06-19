@@ -10,6 +10,7 @@ import AboutMe from './pages/About';
 import Nav from './components/Nav';
 import { Context, initialState, reducer } from './content';
 import { githubQuery, parseQuery } from './utils/common';
+import BlogItem from './pages/Blogs/item';
 
 function App() {
   const location = useLocation()
@@ -47,10 +48,10 @@ function App() {
   return <>
     <Context.Provider value={{ state, dispatch }}>
       <Nav />
-
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/blogs" element={<Blogs />}></Route>
+        <Route path="/blogs/:no" element={<BlogItem />}></Route>
         <Route path="/images" element={<Images />}></Route>
         <Route path="/links" element={<Links />}></Route>
         <Route path="/demos" element={<Demos />}></Route>

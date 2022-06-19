@@ -66,7 +66,7 @@ export default function Home() {
           <div className='text-left'>{sentence.content}</div>
           <div className='text-right'>——{sentence.trans}</div>
         </div>}
-        <div className='absolute bottom-full right-0 shadow-white shadow-inner'>
+        <div className='absolute bottom-full right-0 bg-white rounded-tl-3xl rounded-br-md'>
           {state?.userInfo?.login
             ? <span onClick={logout}><IRun width="32" stroke='#000' /></span>
             : <span onClick={login}><IGithub width="32" stroke='#000' /></span>

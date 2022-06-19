@@ -87,3 +87,29 @@ export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {},
       }).catch(err => reject({ code: 500, msg: "服务器错误" }))
   }) as Promise<any>
 }
+
+
+export const parseQL = (data: any): any => {
+  if (Array.isArray(data)) {
+    return data.map(item => parseQL(item))
+  } else {
+    let obj: any
+    if (data && typeof data === 'object') {
+      obj = {}
+      Object.keys(data).forEach((attr) => {
+        if (attr.match(/edge/i)) {
+          if (Array.isArray(data[attr])) {
+            obj['data'] = data[attr].map((edge: { node: any }) => parseQL(edge.node))
+          } else {
+            obj['data'] = data[attr].node
+          }
+        } else {
+          obj[attr] = parseQL(data[attr])
+        }
+      })
+    } else {
+      obj = data
+    }
+    return obj
+  }
+}

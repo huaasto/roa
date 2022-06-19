@@ -12,3 +12,99 @@
 .min-w-100{
   min-width: 100px;
 }
+
+
+.issue-detail-wrap{
+  max-width: 1200px;
+  margin: auto;
+}
+
+.left-line{
+  flex: 1;
+  min-width: 300px;
+}
+
+
+.right-line{
+  position: relative;
+  width: 360px;
+  align-self: flex-start;
+}
+.right-line::before, .right-line::after{
+  content: '';
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  width: 3px;
+  background-color: #999;
+  z-index: -1;
+}
+.right-line::before{
+  left: 20px;
+}
+.right-line::after{
+  right: 20px;
+}
+
+
+
+.comment-item-wrap{
+  background-color: #fff;
+}
+
+.comment-login-avatar{
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+.comment-author-name{
+  line-height: 28px;
+}
+
+
+@media (max-width: 769px) {
+  .right-line{
+    width: 100%;
+  }
+}
+
+@media (min-width: 769px) {
+  .right-line{
+    position: sticky;
+    top: 0;
+  }
+  .comment-items-wrap{
+    max-height: 90vh;
+    overflow: auto;
+  }
+}
+
+
+.label{
+  display: inline-block;
+  padding: 3px 18px;
+  border-radius: 20px;
+  margin-right: 10px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.page-wrap-outlined{
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #b4b4b4;
+  border-radius: 4px;
+  background-color: #fff;
+  word-break: break-all;
+}
+
+.page-wrap{
+  padding: 10px;
+  margin: 10px;
+  border-radius: 4px;
+  color: #fff;
+}
+
