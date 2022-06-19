@@ -28,7 +28,7 @@ export default function Links() {
       const data = res.data
       const info = { ...currentLinkInfo }
       info.title || (info.title = data.match(/<title>(.*)<\/title>/)?.[1] || '')
-      info.img || (info.img = data.match(/<img.*src="(.*)".*>/)?.[1] || '')
+      info.img || (info.img = data.match(/<img[^src]*src="([^"]*)".*>/)?.[1] || '')
       info.img = info.img.slice(0, 4) === 'http' ? info.img.split('"')[0] : info.img ? info.link.split('/').slice(0, 3).join('/') + info.img : ''
       info.desc || (info.desc = data.match(/<meta name="description".*content="(.*)".*[(>)|(lt;)]/)?.[1] || '')
       info.desc = info.desc.split('"')[0]
@@ -122,22 +122,26 @@ export default function Links() {
         <IAdd width="56" stroke="#000" />
       </div>}
       {
-        datas.map(link => <div key={link.sha} className="w-full max-w-full overflow-hidden sm:flex h-fit border-2 border-gray-600 border-dashed p-3 m-4 rounded text-center box-border flex-1 sm:basis-2/5 min-w-300 items-center">
-          {!link.img
-            ? <div className='sm:max-h-14 max-w-full h-full p-3 basis-auto flex-grow-0 inline-block'>
-              <ISearch width="32" stroke="#000" />
-            </div>
-            : <div className='flex justify-center items-center min-w-100'>
-              <img className='w-full sm:w-fit sm:max-h-14 max-w-full h-full basis-auto flex-grow-0  max-w-100' src={link.img} alt="" />
-            </div>
-          }
-
+        datas.map(link => <div key={link.sha} className="w-full max-w-full overflow-hidden sm:flex h-fit border-2 border-gray-600 border-dashed p-3 m-4 rounded text-center box-border flex-1 sm:basis-2/5 min-w-300 items-center bg-gray-100">
+          <a href={link.link}>
+            {!link.img
+              ? <div className='sm:max-h-14 max-w-full h-full p-3 basis-auto flex-grow-0 inline-block'>
+                <ISearch width="32" stroke="#000" />
+              </div>
+              : <div className='flex justify-center items-center min-w-100'>
+                <img className='w-full sm:w-fit sm:max-h-14 max-w-full h-full basis-auto flex-grow-0  max-w-100' src={link.img} alt="" />
+              </div>
+            }
+          </a>
           <div className='relative flex flex-col justify-around mx-2 text-left w-full link-text-wrap sm:h-14'>
-            <a className='w-full sm:whitespace-nowrap overflow-hidden text-ellipsis break-all font-bold text-lg' target="_blank" href={link.link} rel="noreferrer">{link.title}</a>
+            <div className='flex items-center'>
+              <a className='w-full sm:whitespace-nowrap overflow-hidden text-ellipsis break-all font-bold text-lg' target="_blank" href={link.link} rel="noreferrer">{link.title}</a>
+              {state?.userInfo?.login === "huaasto" && <span className='bg-gray-100 pl-2' onClick={() => { setCurrentLinkInfo(link); setShowBg(true) }}>
+                <IEdit width="28" stroke='#000' />
+              </span>}
+            </div>
             <div className='w-full sm:whitespace-nowrap overflow-hidden text-ellipsis break-all text-gray-400'>{link.desc}</div>
-            {state?.userInfo?.login === "huaasto" && <span className='absolute right-0 bottom-0' onClick={() => { setCurrentLinkInfo(link); setShowBg(true) }}>
-              <IEdit width="28" stroke='#000' />
-            </span>}
+
           </div>
         </div>)
       }
@@ -152,7 +156,7 @@ export default function Links() {
         <div className='flex items-center'>
           {currentLinkInfo.img ?
             <img src={currentLinkInfo.img} alt="" className='h-9 mx-2' /> :
-            <div className="h-fit border-2 border-white border-dashed p-1 mx-2 rounded text-center" onClick={() => setShowBg(true)}>
+            <div className="h-fit border-2 border-white border-dashed p-1 mx-2 rounded text-center" onClick={() => setCurrentLinkInfo(Object.assign({}, currentLinkInfo, { img: " " }))}>
               <IAdd width="24" stroke="#fff" />
             </div>
           }

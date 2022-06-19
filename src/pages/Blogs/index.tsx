@@ -1,7 +1,130 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { Context } from '../../content'
+import { IEdit } from '../../icons'
+import { Format, githubQuery } from '../../utils/common'
+import "./blog.css"
+
+type TBlogs = {
+  img: string,
+  title: string,
+  desc: string,
+  blog: string,
+  bodyText?: string,
+  id?: number,
+  publishedAt?: string,
+  comment?: {
+    author: {
+      login: string,
+      avatarUrl: string
+    },
+    bodyText: string
+  }
+}
 
 export default function Blogs() {
-  return (
-    <div>Blogs</div>
+  const { state } = useContext(Context)
+  const [datas, setDatas] = useState<TBlogs[]>([])
+  const queryBlogs = async () => {
+    const ql = `query {
+      repository(owner:"huaasto", name:"sdfs") {
+        issues(labels: ["blog"], first: 100, orderBy: {direction: DESC, field: UPDATED_AT}) {
+          edges{
+            node{
+              bodyText
+              body
+              createdAt 
+              title
+              id
+              publishedAt
+              labels(first: 6) {
+                edges {
+                  node {
+                    id
+                    name
+                    color
+                  }
+                }
+              }
+              number
+              comments(first: 1){
+                edges{
+                  node{
+                    author{
+                      login
+                      avatarUrl
+                    }
+                    bodyText
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }`
+    const res = await githubQuery({
+      url: "https://api.github.com/graphql",
+      method: "POST",
+      data: { query: ql },
+      headers: state?.userInfo?.login !== "huaasto" ? {
+        Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==')
+      } : {}
+    })
+    let blogs = []
+    blogs = res.data.data.repository.issues.edges.map((blog: any) => {
+      var obj = {
+        title: '',
+        img: 'https://cdn.jsdelivr.net/gh/huaasto/empty@master/public/2022_06_19/pic1655629880400553.jpg'
+      }
+      try {
+        obj = JSON.parse(blog.node.title)
+      } catch (err) {
+        obj.title = blog.node.title
+      }
+      return Object.assign(blog.node, {
+        ...obj,
+        comment: blog.node.comments.edges[0].node,
+        labels: blog.node.labels.edges.map((label: any) => label.node)
+      })
+    })
+    console.log(blogs)
+    setDatas(blogs)
+  }
+  useEffect(() => {
+    queryBlogs()
+  }, [])
+  return (<>
+    <div className="flex flex-wrap mt-10 justify-start max-w-5xl m-auto">
+      {state?.userInfo?.login === "huaasto" && <div className="fixed bottom-2 right-2 w-fit h-fit border-2 border-gray-600 p-1 m-4 rounded text-center">
+        <IEdit width="32" stroke="#666" />
+      </div>}
+      {
+        datas.map((blog, i) => <div key={blog.id} className="relative flex w-full m-2 h-40 overflow-hidden rounded-2xl flex-wrap sm:flex-nowrap">
+          {<div className={'flex-1 basis-full sm:flex-shrink-0 sm:basis-7/12 h-full bg-center bg-cover' + (i % 2 ? ' md:order-1' : '')} style={{ backgroundImage: `url("${blog.img || 'https://cdn.jsdelivr.net/gh/huaasto/empty@master/public/2022_06_19/pic1655629880400553.jpg'}")` }}>
+          </div>}
+
+          <div className='absolute left-0 right-0 sm:static flex-1 basis-full h-full p-2 overflow-hidden bg-black bg-opacity-25 sm:bg-transparent text-white sm:text-inherit flex flex-col'>
+            <div className=' flex-shrink-0'>
+              {state?.userInfo?.login === "huaasto" && <span className=' mx-3 stroke-current'>
+                <IEdit width="20" />
+              </span>}
+              <a className='w-full sm:whitespace-nowrap overflow-hidden text-ellipsis break-all font-bold text-lg' href="x" rel="noreferrer">{blog.title}</a>
+            </div>
+            <div className=' w-full flex-1 overflow-hidden text-ellipsis break-all text-gray-400 several-line'>
+              <span className='hidden sm:block'>{blog.bodyText}</span>
+            </div>
+            <span className='hidden sm:block one-line'>
+              <img src={blog.comment?.author.avatarUrl} className="hidde inline-block w-5 h-5 mx-3 align-middle rounded-full" alt="" />
+              {blog.comment?.bodyText}
+            </span>
+            <div className=' text-right text-sm'>——更新于{Format(new Date(String(blog.publishedAt)), 'YYYY-MM-DD HH:mm:ss')}</div>
+          </div>
+        </div>)
+      }
+
+
+    </div>
+  </>
   )
 }
+
