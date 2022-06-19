@@ -56,6 +56,8 @@ export default function About() {
       <div className=" flex-1 flex-shrink-0 basis-80">
         {/*  <div className="bg-white p-4" dangerouslySetInnerHTML={{ __html: content.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || "" }}>
         </div>*/}
+        {content && <div className="bg-white p-4" dangerouslySetInnerHTML={{ __html: content.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '' }}>
+        </div>}
       </div>
     </div>
   </div>)
