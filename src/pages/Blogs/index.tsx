@@ -101,9 +101,6 @@ export default function Blogs() {
   }, [])
   return (<>
     <div className="flex flex-wrap mt-10 justify-start max-w-5xl m-auto py-2">
-      {state?.userInfo?.login === "huaasto" && <div className="fixed bottom-2 right-2 w-fit h-fit border-2 border-gray-600 p-1 m-4 rounded text-center">
-        <IEdit width="32" stroke="#666" />
-      </div>}
       {
         datas.map((blog, i) => <Link to={"/blogs/" + blog.number} key={blog.id} className="block w-full p-2">
           <div className="relative flex h-40 overflow-hidden rounded-2xl flex-wrap sm:flex-nowrap">
@@ -127,6 +124,9 @@ export default function Blogs() {
           </div>
         </Link>)
       }
+      {state?.userInfo?.login === "huaasto" && <div className="fixed bottom-2 right-2 w-fit h-fit border-2 border-gray-600 p-1 m-4 rounded text-center">
+        <IEdit width="32" stroke="#666" />
+      </div>}
     </div>
   </>
   )
