@@ -36,7 +36,7 @@ export default function About() {
   return (<>
     <div className='p-3 sm:p-10 bg-slate-400 h-full min-h-screen'>
       324234 About
-      {/* <div className='sm:fixed left-0 right-1/2 top-0 bottom-0 px-3 py-10 text-white whitespace-nowrap'>
+      <div className='sm:fixed left-0 right-1/2 top-0 bottom-0 px-3 py-10 text-white whitespace-nowrap'>
         <div className='flex justify-center items-center h-full'>
           <span className='font-bold text-4xl'>且听当世多变化</span>
         </div>
@@ -47,7 +47,7 @@ export default function About() {
           <div className='bg-white p-4' dangerouslySetInnerHTML={{ __html: content.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '' }}>
           </div>
         </div>
-      </div> */}
+      </div>
 
     </div>
   </>)
