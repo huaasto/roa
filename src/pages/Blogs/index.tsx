@@ -13,7 +13,8 @@ type TBlog = {
   bodyText?: string,
   id?: number,
   number?: number,
-  publishedAt?: string,
+  updatedAt
+  ?: string,
   comment?: {
     author: {
       login: string,
@@ -37,7 +38,7 @@ export default function Blogs() {
               createdAt 
               title
               id
-              publishedAt
+              updatedAt
               labels(first: 6) {
                 edges {
                   node {
@@ -119,7 +120,8 @@ export default function Blogs() {
                 <img src={blog.comment?.author.avatarUrl} className="hidde inline-block w-5 h-5 mx-3 align-middle rounded-full" alt="" />
                 {blog.comment?.bodyText}
               </span>
-              <div className=' text-right text-sm'>——更新于{Format(new Date(String(blog.publishedAt)), 'YYYY-MM-DD HH:mm:ss')}</div>
+              <div className=' text-right text-sm'>——更新于{Format(new Date(String(blog.updatedAt
+              )), 'YYYY-MM-DD HH:mm:ss')}</div>
             </div>
           </div>
         </Link>)
