@@ -24,6 +24,7 @@ export default function About() {
         Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==')
       } : {}
     })
+    console.log(res.data?.data?.repository?.issue?.bodyHTML)
     setContent(res.data?.data?.repository?.issue?.bodyHTML)
   }
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function About() {
     <div className='flex w-full flex-wrap sm:flex-nowrap'>
       <div className='flex-1 basis-80 w-1/2'></div>
       <div className=' flex-1 flex-shrink-0 basis-80'>
-        <div className='bg-white p-4' dangerouslySetInnerHTML={{ __html: content.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '' }}>
+        <div className='bg-white p-4' dangerouslySetInnerHTML={{ __html: content?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '' }}>
         </div>
       </div>
     </div>
