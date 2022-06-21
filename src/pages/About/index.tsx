@@ -26,6 +26,7 @@ export default function About() {
         Authorization: window.atob("dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==")
       } : {}
     })
+    console.log(res.data?.data?.repository?.issue)
     setContent(res.data?.data?.repository?.issue?.bodyHTML)
   }
   useEffect(() => {
