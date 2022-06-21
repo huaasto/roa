@@ -43,7 +43,7 @@ export default function About() {
     <div className="flex w-full flex-wrap sm:flex-nowrap">
       <div className="flex-1 basis-80 w-1/2"></div>
       <div className=" flex-1 flex-shrink-0 basis-80">
-        {content && <div className="bg-white p-4" dangerouslySetInnerHTML={{ __html: String(content) }}>
+        {content && <div className="bg-white p-4" style={{ backgroundColor: '#fff' }} dangerouslySetInnerHTML={{ __html: String(content) }}>
         </div>}
       </div>
     </div>

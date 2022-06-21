@@ -88,6 +88,7 @@ const BlogItem = () => {
           }
         }
       }`
+    console.log(333)
     githubQuery({
       url: "https://api.github.com/graphql",
       method: "POST",
@@ -96,12 +97,13 @@ const BlogItem = () => {
         Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==')
       } : {}
     }).then((res: any) => {
+      console.log('qwww')
       if (!res.data) return
       const data = parseQL(res.data.data)
       console.log(data)
       const issue = data?.repository.issue
       issue.comments.data = issue.comments.data.length ? issue.comments.data.reverse() : []
-      console.log(issue.bodyHTML?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '', issue.bodyHTML?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master"))
+      console.log(232)
       setData(issue)
     })
   }
