@@ -49,7 +49,7 @@ const BlogItem = () => {
   const comment = useRef<HTMLTextAreaElement>(null)
   const { state } = useContext(Context)
 
-  const queryData = useCallback(() => {
+  const queryData = () => {
     const ql = `query {
         repository(owner:"huaasto", name:"sdfs") {
           issue(number: ${+path[path.length - 1]}) {
@@ -102,9 +102,9 @@ const BlogItem = () => {
       const issue = data?.repository.issue
       issue.comments.data = issue.comments.data.length ? issue.comments.data.reverse() : []
       console.log(issue.bodyHTML?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '', issue.bodyHTML?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master"))
-      setData(Object.assign(issue, { bodyHTML: issue.bodyHTML }))
+      setData(issue)
     })
-  }, [])
+  }
 
   const addComment = useCallback(() => {
     if (!comment.current?.value) return;
