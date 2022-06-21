@@ -27,7 +27,7 @@ export default function About() {
       } : {}
     })
     console.log(res.data?.data?.repository?.issue)
-    setContent(res.data?.data?.repository?.issue?.bodyHTML)
+    setContent(res.data?.data?.repository?.issue?.bodyHTML?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '')
   }
   useEffect(() => {
     queryAbout()
@@ -49,5 +49,4 @@ export default function About() {
     </div>
   </div>)
 }
-// ?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || ''
 
