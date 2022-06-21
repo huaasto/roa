@@ -26,8 +26,8 @@ export default function About() {
         Authorization: window.atob("dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==")
       } : {}
     })
-    console.log(res.data?.data?.repository?.issue)
-    setContent(res.data?.data?.repository?.issue?.bodyHTML?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '')
+    console.log(res.data?.data?.repository?.issue?.bodyHTML)
+    setContent(res.data?.data?.repository?.issue?.bodyHTML)
   }
   useEffect(() => {
     queryAbout()
