@@ -162,7 +162,7 @@ const BlogItem = () => {
             </div>
           </div>
           <div className="page-wrap-outlined">
-            {data?.bodyHTML && <div dangerouslySetInnerHTML={{ __html: data.bodyHTML.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '' }}>
+            {data?.bodyHTML && <div dangerouslySetInnerHTML={{ __html: String(data.bodyHTML)?.replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || '' }}>
             </div>}
           </div>
           <div className="page-wrap-outlined">
