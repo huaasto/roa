@@ -90,7 +90,6 @@ export default function Blogs() {
         labels: blog.node.labels.edges.map((label: any) => label.node)
       })
     })
-    console.log(blogs)
     setDatas(blogs)
   }
   const editBlog = (e: any, blog: TBlog) => {
@@ -111,7 +110,7 @@ export default function Blogs() {
                 {state?.userInfo?.login === "huaasto" && <span className=' mx-3 stroke-current' onClick={(e) => editBlog(e, blog)}>
                   <IEdit width="20" />
                 </span>}
-                <a className='w-full sm:whitespace-nowrap overflow-hidden text-ellipsis break-all font-bold text-lg' href="x" rel="noreferrer">{blog.title}</a>
+                <span className='w-full sm:whitespace-nowrap overflow-hidden text-ellipsis break-all font-bold text-lg'>{blog.title}</span>
               </div>
               <div className=' w-full flex-1 overflow-hidden text-ellipsis break-all text-gray-400 several-line'>
                 <span className='hidden sm:block'>{blog.bodyText}</span>

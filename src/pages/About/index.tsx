@@ -33,7 +33,7 @@ export default function About() {
   }, [])
 
 
-  return (<div className="p-3 sm:p-10 bg-slate-400 h-full" style={{ backgroundColor: '#096a' }}>
+  return (<div className="p-3 sm:p-10 bg-slate-400 h-full min-h-screen" style={{ backgroundColor: '#096a' }}>
     <div className="sm:fixed left-0 right-1/2 top-0 bottom-0 px-3 py-10 text-white whitespace-nowrap">
       <div className="flex justify-center items-center h-full">
         <span className="font-bold text-4xl">且听当世多变化</span>
