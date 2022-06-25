@@ -70,8 +70,10 @@ export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {},
         })
       }).then(res => {
         if (res.status === 401 || res.status === 502) {
+          const result = { 401: 'token is expired!!', 502: '服务器端报错' }[res.status]
           // token失效
-          reject({ code: 401, msg: "token is expired!!" })
+          res.status === 401 && alert('token is expired!!')
+          resolve({ code: res.status, msg: result })
         }
         if (type === 'json') {
           return res.json()
@@ -81,7 +83,8 @@ export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {},
         // return { json: res.json, text: res.text }[type]()
       }).then(data => {
         if (!data) {
-          reject({ error: 0 })
+          alert("未获取到数据")
+          resolve({ error: 0 })
         }
         resolve(data)
       }).catch(err => reject({ code: 500, msg: "服务器错误" }))
@@ -112,4 +115,8 @@ export const parseQL = (data: any): any => {
     }
     return obj
   }
+}
+
+export const isMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|IOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }

@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } from "react"
 import { IAdd, ILinks, ITrash } from "../../icons"
 import Compressor from 'compressorjs';
-import { Format, githubQuery } from "../../utils/common";
+import { Format, githubQuery, isMobile } from "../../utils/common";
 import "./index.css"
 import { Context } from "../../content";
 
@@ -63,7 +63,11 @@ export default function Images() {
   }
   const uploader = useCallback((image: File & { url: string; }) => {
     return new Promise(async (resolve, reject) => {
-
+      console.log(isMobile(), image.size, 1024 * 1024 * 3)
+      if (isMobile() && image.size > 1024 * 1024 * 3) {
+        resolve({ status: 999 })
+        return
+      }
       let properImage: File
       if (!image.type.match('gif')) {
         properImage = (600 * 1024) / image.size > 1 ? await myCompressor(image, { quality: +((600 * 1024) / image.size / 2).toFixed(1) }) : image
@@ -135,11 +139,11 @@ export default function Images() {
       }
     })
   }, [])
-  const initFile = () => {
+  const initFile = (inds = [] as number[]) => {
     fileRef.current && (fileRef.current.files = null)
-    setMiniFiles([])
+    setMiniFiles(inds.map(i => miniFiles[i]))
     setLoading(false)
-    setTotal(0)
+    setTotal(inds.length)
     setCurrent(0)
   }
   const removePic = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, i: number) => {
@@ -201,16 +205,21 @@ export default function Images() {
     if (!fileRef.current?.files?.length) return
     setLoading(true)
     const newImgs = []
+    const errInds = []
     for (let i = 0; i < miniFiles.length; i++) {
       setCurrent(i + 1)
       const pic = miniFiles[i]
       const newImg: any = await uploader(pic as File & { url: string; })
-      newImg.status === 201 && newImgs.push(Object.assign({}, newImg.data.content, {}))
+      if (!!{ 201: true, 200: true }[newImg.status as number]) {
+        newImgs.push(Object.assign({}, { content: newImg.data.content }, {}))
+      } else {
+        errInds.push(i)
+      }
     }
     queryDates()
     queryOneDayImgs(Format(new Date(), 'YYYY_MM_DD'))
-    initFile()
-    alert("已全部上传")
+    initFile(errInds)
+    alert("已上传完成")
   }
   const removeCurrentPic = async (e: any, date: string, img: Date) => {
     e.stopPropagation()
@@ -227,7 +236,7 @@ export default function Images() {
         url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
         method: "GET",
       })
-      githubQuery({
+      data?.data?.sha && githubQuery({
         url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + img.name,
         method: "DELETE",
         data: {
