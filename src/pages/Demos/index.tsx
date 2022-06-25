@@ -4,7 +4,6 @@ import { Context } from '../../content'
 export default function Demos() {
   const { state, dispatch } = useContext(Context)
   const change = (value: string) => {
-    console.log(value)
     dispatch({ type: "update", value: { name: value } })
   }
   useEffect(() => {

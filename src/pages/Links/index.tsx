@@ -43,7 +43,6 @@ export default function Links() {
         labels: 'link'
       }
     })
-    console.log(res)
     let links = []
     try {
       links = res.data.map((link: { number: number, body: string }) => ({

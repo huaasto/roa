@@ -63,7 +63,6 @@ export default function Images() {
   }
   const uploader = useCallback((image: File & { url: string; }) => {
     return new Promise(async (resolve, reject) => {
-      console.log(isMobile(), image.size, 1024 * 1024 * 3)
       if (isMobile() && image.size > 1024 * 1024 * 3) {
         resolve({ status: 999 })
         return
@@ -176,7 +175,6 @@ export default function Images() {
     })
     ).reverse()
     imgs[dates] = imgData
-    console.log(imgs)
     setDatesImages(imgs)
     isPublic || Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' || img.proUrl ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
       const realImgs = JSON.parse(JSON.stringify(imgs))
@@ -269,7 +267,6 @@ export default function Images() {
     textareaC.select();
     var res = document.execCommand('copy');
     document.body.removeChild(textareaC);//移除DOM元素
-    console.log(img)
     alert("复制成功");
     return res;
   }
