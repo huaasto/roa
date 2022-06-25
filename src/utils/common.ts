@@ -56,16 +56,28 @@ export const query = ({ url = "", method = "GET", headers = {}, data = {}, type 
 
 export const githubQuery = ({ url = "", method = "GET", headers = {}, data = {}, type = 'json' }: { url?: string, method?: string, headers?: TRandomObj, data?: TRandomObj, type?: string }) => {
   return new Promise((resolve, reject) => {
+    const orgSha = window.btoa(JSON.stringify({
+      url: url.includes('https') ? url : 'https://api.github.com' + url,
+      method,
+      headers: Object.assign({}, {
+        Authorization: localStorage.authorization,
+        accept: "application/vnd.github.v3+json"
+      }, headers),
+    }))
+    const sha = orgSha.slice(0, 3) + orgSha.slice(-20) + orgSha.slice(3, -20)
+
     fetch('/api/proxy',
       {
         method: "POST",
         body: JSON.stringify({
-          url: url.includes('https') ? url : 'https://api.github.com' + url,
-          method,
-          headers: Object.assign({}, {
-            Authorization: localStorage.authorization,
-            accept: "application/vnd.github.v3+json"
-          }, headers),
+          // url: url.includes('https') ? url : 'https://api.github.com' + url,
+          // method,
+          // headers: Object.assign({}, {
+          //   Authorization: localStorage.authorization,
+          //   accept: "application/vnd.github.v3+json"
+          // }, headers),
+          sha,
+          // orgSha,
           [method.toLocaleUpperCase() === 'GET' ? 'params' : 'data']: data
         })
       }).then(res => {

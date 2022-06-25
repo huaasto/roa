@@ -26,7 +26,13 @@ const queryPostData = (req) => {
 
 module.exports = async (req, res) => {
   const postData = await queryPostData(req)
-  const data = await axios(postData)
+  const orgSha = postData.sha.slice(0, 3) + postData.sha.slice(23) + postData.sha.slice(3, 23)
+  const realData = Buffer.from(orgSha, 'base64')
+  const reqData = Object.assign({}, JSON.parse(realData.toString()))
+  postData?.params && (reqData.params = postData.params)
+  postData?.data && (reqData.data = postData.data)
+  // console.log(postData.sha, postData.orgSha, orgSha === postData.orgSha)
+  const data = await axios(reqData)
   if (!data.data) {
     res.json({ err: '请求失败' })
   } else {
