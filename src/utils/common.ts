@@ -132,3 +132,37 @@ export const parseQL = (data: any): any => {
 export const isMobile = () => {
   return /Android|webOS|iPhone|iPad|iPod|IOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }
+
+export const randomString = (length = 4, chars = 'abcdefghijklmnopqrstuvwxyz'): string => {
+  return [...Array(length)].map(_ => chars.charAt(Math.floor(Math.random() * chars.length))).join('')
+}
+
+export const uploadImg = (file: File) => {
+  return new Promise((resolve) => {
+    const par = {
+      name: 'pic' + Date.now() + String(Math.random()).slice(4, 7) + '.' + file.name.split('.').reverse()[0],
+      path: Format(new Date(), 'YYYY_MM_DD')
+    }
+    var reader = new FileReader() //实例化文件读取对象
+    reader.readAsDataURL(file) //将文件读取为 DataURL,也就是base64编码
+    // }
+
+    reader.onload = async function (ev) {
+      if (typeof ev?.target?.result !== 'string') return
+      var dataURL = ev.target.result.split(',')[1] //获得文件读取成功后的DataURL,也就是base64编码
+      const data = await githubQuery({
+        url: 'https://api.github.com/repos/huaasto/blogPics/contents/' + par.path + '/' + par.name,
+        method: "PUT",
+        data: {
+          content: dataURL,
+          message: 'create img'
+        },
+        headers: {
+          Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==')
+        }
+      })
+      resolve(data)
+    }
+  })
+
+}

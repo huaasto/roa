@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate, useRoutes } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { Context } from '../../content'
-import { Format, githubQuery, parseQL } from '../../utils/common'
+import { Format, githubQuery, parseQL, randomString } from '../../utils/common'
 import './blog.css'
 
 type comment = {
@@ -33,11 +33,6 @@ type Issue = {
   }
 }
 
-
-type IProps = {
-  token: string,
-  color: string
-}
 // markup
 const BlogItem = () => {
 
@@ -48,8 +43,8 @@ const BlogItem = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const comment = useRef<HTMLTextAreaElement>(null)
   const { state } = useContext(Context)
-
-  const queryData = () => {
+  const [bg, setBg] = useState('')
+  const queryData = useCallback(() => {
     const ql = `query {
         repository(owner:"huaasto", name:"sdfs") {
           issue(number: ${+path[path.length - 1]}) {
@@ -99,48 +94,37 @@ const BlogItem = () => {
       if (!res.data) return
       const data = parseQL(res.data.data)
       const issue = data?.repository.issue
+      var content
+      try {
+        content = JSON.parse(issue.title)
+        issue.title = content.title
+        setBg(content.img)
+      } catch {
+        console.log('暂无图片')
+      }
+      // issue.title =
       issue.comments.data = issue.comments.data.length ? issue.comments.data.reverse() : []
       setData(issue)
     })
-  }
+  }, [path, state?.userInfo?.login])
 
   const addComment = useCallback(() => {
     if (!comment.current?.value) return;
-    const reg = /([\\\"]+)/g
     setLoading(true)
-    const ql = `mutation {
-      addComment(input: {
-        body: "${comment.current?.value.replace(reg, "\\$1")}"
-        subjectId: "${data?.id}"
-      }) {
-        commentEdge {
-          node {
-            bodyHTML
-            author {
-              login
-              avatarUrl
-            }
-            publishedAt
-          }
-        }
-      }
-    }`
     githubQuery({
-      url: "https://api.github.com/graphql",
+      url: `https://api.github.com/repos/huaasto/sdfs/issues/${+path[path.length - 1]}/comments`,
       method: "POST",
-      data: { query: ql },
+      data: { body: comment.current?.value },
       headers: state?.userInfo?.login !== "huaasto" ? {
         Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==')
       } : {}
     }).then((res: any) => {
       setLoading(false)
       if (!res.data) return
-      const result = parseQL(res.data.data)
-      const comments: comment[] = data?.comments?.data || []
-      setData(Object.assign({}, data, { comments: { data: [result.addComment.data, ...comments] } }))
       comment.current && (comment.current.value = '')
+      queryData()
     })
-  }, [data, comment])
+  }, [comment, path, state?.userInfo?.login, queryData])
 
 
   useEffect(() => {
@@ -150,6 +134,7 @@ const BlogItem = () => {
   return (
     <main>
       <title>😆Blog</title>
+      <img className='fixed -z-10 top-0 bottom-0 left-0 right-0 object-cover min-h-screen' src={bg} alt="" />
       <div className="issue-detail-wrap flex mobile-wrap">
         <div className="left-line">
           <div className="page-wrap-outlined">
@@ -180,14 +165,15 @@ const BlogItem = () => {
               data.comments.data.map((comment, i) =>
                 <div key={i} className="page-wrap-outlined comment-item-wrap">
                   <div>
-                    <img src={comment?.author?.avatarUrl} className="comment-login-avatar" alt="" />
-                    <span className="comment-author-name line-normal">{comment.author.login}</span>
+                    {/* http://api.btstu.cn/sjtx/api.php?lx=a1&format=images */}
+                    <img src={comment?.author?.login !== 'huaasto' ? comment.author.avatarUrl : `https://ui-avatars.com/api/?name=${randomString()}`} className="comment-login-avatar" alt="" />
+                    <span className="comment-author-name line-normal">{comment.author.login === 'huaasto' ? '匿名用户' : comment.author.login}</span>
                     <span className="text-small f-right line-normal">{Format(new Date(String(comment.publishedAt)), 'YYYY-MM-DD HH:mm:ss')}</span>
                   </div>
                   <div className="zoom" dangerouslySetInnerHTML={{ __html: comment.bodyHTML }}></div>
                 </div>
               ) :
-              <div className="page-wrap-outlined comment-item-wrap no-result">
+              <div className="page-wrap-outlined comment-item-wrap no-result" style={{ backgroundColor: "#fff" }}>
                 <div>来为评论区添砖加瓦吧</div>
               </div>
             }

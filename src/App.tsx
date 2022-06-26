@@ -11,6 +11,7 @@ import Nav from './components/Nav';
 import { Context, initialState, reducer } from './content';
 import { githubQuery, parseQuery } from './utils/common';
 import BlogItem from './pages/Blogs/item';
+import Write from './pages/Blogs/write';
 
 function App() {
   const location = useLocation()
@@ -51,6 +52,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/blogs" element={<Blogs />}></Route>
+        <Route path="/blogs/create" element={<Write />}></Route>
+        <Route path="/blogs/edit/:no" element={<Write />}></Route>
         <Route path="/blogs/:no" element={<BlogItem />}></Route>
         <Route path="/images" element={<Images />}></Route>
         <Route path="/links" element={<Links />}></Route>

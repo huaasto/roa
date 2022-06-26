@@ -30,6 +30,7 @@ module.exports = async (req, res) => {
   if (postData.sha) {
     const orgSha = postData.sha.slice(0, 3) + postData.sha.slice(23) + postData.sha.slice(3, 23)
     const realData = Buffer.from(orgSha, 'base64')
+    console.log(JSON.parse(realData.toString()))
     reqData = Object.assign({}, JSON.parse(realData.toString()))
     postData?.params && (reqData.params = postData.params)
     postData?.data && (reqData.data = postData.data)

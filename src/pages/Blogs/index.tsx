@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Context } from '../../content'
 import { IEdit } from '../../icons'
-import { Format, githubQuery } from '../../utils/common'
+import { Format, githubQuery, randomString } from '../../utils/common'
 import "./blog.css"
 
 type TBlog = {
@@ -27,6 +27,7 @@ type TBlog = {
 export default function Blogs() {
   const { state } = useContext(Context)
   const [datas, setDatas] = useState<TBlog[]>([])
+  const navigate = useNavigate()
   const queryBlogs = async () => {
     const ql = `query {
       repository(owner:"huaasto", name:"sdfs") {
@@ -49,7 +50,7 @@ export default function Blogs() {
                 }
               }
               number
-              comments(first: 1){
+              comments(last: 1){
                 edges{
                   node{
                     author{
@@ -86,7 +87,7 @@ export default function Blogs() {
       }
       return Object.assign(blog.node, {
         ...obj,
-        comment: blog.node.comments.edges[0].node,
+        comment: blog.node.comments?.edges?.[0]?.node || null,
         labels: blog.node.labels.edges.map((label: any) => label.node)
       })
     })
@@ -95,6 +96,7 @@ export default function Blogs() {
   const editBlog = (e: any, blog: TBlog) => {
     e.stopPropagation()
     e.preventDefault()
+    navigate(`/blogs/edit/${blog.number}`)
   }
   useEffect(() => {
     queryBlogs()
@@ -115,19 +117,19 @@ export default function Blogs() {
               <div className=' w-full flex-1 overflow-hidden text-ellipsis break-all text-gray-400 several-line'>
                 <span className='hidden sm:block'>{blog.bodyText}</span>
               </div>
-              <span className='hidden sm:block one-line'>
-                <img src={blog.comment?.author.avatarUrl} className="hidde inline-block w-5 h-5 mx-3 align-middle rounded-full" alt="" />
+              {blog.comment && <span className='hidden sm:block one-line'>
+                <img src={blog.comment?.author?.login !== 'huaasto' ? blog.comment.author.avatarUrl : `https://ui-avatars.com/api/?name=${randomString()}`} className="hidde inline-block w-5 h-5 mx-3 align-middle rounded-full" alt="" />
                 {blog.comment?.bodyText}
-              </span>
+              </span>}
               <div className=' text-right text-sm'>——更新于{Format(new Date(String(blog.updatedAt
               )), 'YYYY-MM-DD HH:mm:ss')}</div>
             </div>
           </div>
         </Link>)
       }
-      {state?.userInfo?.login === "huaasto" && <div className="fixed bottom-2 right-2 w-fit h-fit border-2 border-gray-600 p-1 m-4 rounded text-center">
+      {state?.userInfo?.login === "huaasto" && <Link to="/blogs/create"><div className="fixed bottom-2 right-2 w-fit h-fit border-2 border-gray-600 p-1 m-4 rounded text-center">
         <IEdit width="32" stroke="#666" />
-      </div>}
+      </div></Link>}
     </div>
   </>
   )
