@@ -181,9 +181,9 @@ export default function Write() {
       <div className=' max-w-5xl m-auto'>
         <div className="page-wrap-outlined opacity-80" style={{ backgroundColor: 'inherit' }}>
           <input defaultValue={title} type="text" className=" mb-3" placeholder='title' onChange={(e) => setTitle(e.target.value)} />
-          <textarea ref={Imgwrap} value={body} id="dropZone" name="comment" cols={30} rows={10} placeholder="body" onChange={(e) => setBody(e.target.value)}></textarea>
+          <textarea ref={Imgwrap} defaultValue={body} id="dropZone" name="comment" cols={30} rows={10} placeholder="body" onChange={(e) => setBody(e.target.value)}></textarea>
           <div style={{ textAlign: "right" }}>
-            {title && body && <button className="primary" onClick={number ? updateBlog : createBlog}>submit</button>}
+            {title && (body || Imgwrap.current?.value) && <button className="primary" onClick={number ? updateBlog : createBlog}>submit</button>}
           </div>
         </div>
       </div>

@@ -6,11 +6,9 @@ export const useDropEvent = (parseUrl = (url: string) => url) => {
   const [update, setUpdate] = useState(false)
   const Imgwrap = useRef<HTMLTextAreaElement>(null)
   function getDropFileCallBack(dropFiles: any) {
-    console.log(dropFiles, dropFiles.length);
     uploadImg(dropFiles[0]).then((res: any) => {
       // if (!res.data) return alert('插入图片失败')
       const url = res.data.content?.download_url.replace("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || ''
-      console.log(Imgwrap.current?.value, url)
       Imgwrap.current && url && (Imgwrap.current.value += parseUrl(url))
       setUpdate(!update)
     })
