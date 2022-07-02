@@ -115,9 +115,7 @@ const BlogItem = () => {
       url: `https://api.github.com/repos/huaasto/sdfs/issues/${+path[path.length - 1]}/comments`,
       method: "POST",
       data: { body: comment.current?.value },
-      headers: state?.userInfo?.login !== "huaasto" ? {
-        Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==')
-      } : {}
+      headers: state?.userInfo?.login ? {} : { Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==') }
     }).then((res: any) => {
       setLoading(false)
       if (!res.data) return
@@ -166,7 +164,7 @@ const BlogItem = () => {
                 <div key={i} className="page-wrap-outlined comment-item-wrap">
                   <div>
                     {/* http://api.btstu.cn/sjtx/api.php?lx=a1&format=images */}
-                    <img src={comment?.author?.login !== 'huaasto' ? comment.author.avatarUrl : `https://ui-avatars.com/api/?name=${randomString()}`} className="comment-login-avatar" alt="" />
+                    <img src={comment?.author?.login === 'huaasto' ? `https://ui-avatars.com/api/?name=${randomString()}` : comment.author.avatarUrl} className="comment-login-avatar" alt="" />
                     <span className="comment-author-name line-normal">{comment.author.login === 'huaasto' ? '匿名用户' : comment.author.login}</span>
                     <span className="text-small f-right line-normal">{Format(new Date(String(comment.publishedAt)), 'YYYY-MM-DD HH:mm:ss')}</span>
                   </div>
