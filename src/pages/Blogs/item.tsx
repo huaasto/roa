@@ -111,6 +111,14 @@ const BlogItem = () => {
   const addComment = useCallback(() => {
     if (!comment.current?.value) return;
     setLoading(true)
+    console.log({
+      url: `https://api.github.com/repos/huaasto/sdfs/issues/${+path[path.length - 1]}/comments`,
+      method: "POST",
+      data: { body: comment.current?.value },
+      headers: state?.userInfo?.login ? {} : { Authorization: window.atob('dG9rZW4gZ2hwX04xdVV3TUlRamVvUERlZ2NUWkptbWVtSEh6bENVRDA1TmtjWQ==') }
+    })
+    console.log(state.userInfo)
+    // return
     githubQuery({
       url: `https://api.github.com/repos/huaasto/sdfs/issues/${+path[path.length - 1]}/comments`,
       method: "POST",
