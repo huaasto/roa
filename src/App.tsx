@@ -1,17 +1,26 @@
-import React, { useCallback, useEffect, useReducer } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useReducer } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom'
 
-import Home from './pages/Home';
-import Blogs from './pages/Blogs';
-import Images from './pages/Image';
-import Links from './pages/Links';
-import Demos from './pages/Demos';
-import About from './pages/About';
+// import Home from './pages/Home';
+// import Blogs from './pages/Blogs';
+// import Images from './pages/Image';
+// import Links from './pages/Links';
+// import Demos from './pages/Demos';
+// import About from './pages/About';
 import Nav from './components/Nav';
 import { Context, initialState, reducer } from './content';
 import { githubQuery, parseQuery } from './utils/common';
-import BlogItem from './pages/Blogs/item';
-import Write from './pages/Blogs/write';
+// import BlogItem from './pages/Blogs/item';
+// import Write from './pages/Blogs/write';
+
+const Home = lazy(() => import('./pages/Home'))
+const Blogs = lazy(() => import('./pages/Blogs'))
+const Images = lazy(() => import('./pages/Image'))
+const Links = lazy(() => import('./pages/Links'))
+const Demos = lazy(() => import('./pages/Demos'))
+const About = lazy(() => import('./pages/About'))
+const BlogItem = lazy(() => import('./pages/Blogs/item'))
+const Write = lazy(() => import('./pages/Blogs/write'))
 
 function App() {
   const location = useLocation()
@@ -49,17 +58,20 @@ function App() {
   return <>
     <Context.Provider value={{ state, dispatch }}>
       <Nav />
-      <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/blogs" element={<Blogs />}></Route>
-        <Route path="/blogs/create" element={<Write />}></Route>
-        <Route path="/blogs/edit/:no" element={<Write />}></Route>
-        <Route path="/blogs/:no" element={<BlogItem />}></Route>
-        <Route path="/images" element={<Images />}></Route>
-        <Route path="/links" element={<Links />}></Route>
-        <Route path="/demos" element={<Demos />}></Route>
-        <Route path="/about" element={<About />}></Route>
-      </Routes>
+      <Suspense fallback={<div>loading。。。</div>}>
+        <Routes>
+
+          <Route path="/" element={<Home />}></Route>
+          <Route path="/blogs" element={<Blogs />}></Route>
+          <Route path="/blogs/create" element={<Write />}></Route>
+          <Route path="/blogs/edit/:no" element={<Write />}></Route>
+          <Route path="/blogs/:no" element={<BlogItem />}></Route>
+          <Route path="/images" element={<Images />}></Route>
+          <Route path="/links" element={<Links />}></Route>
+          <Route path="/demos" element={<Demos />}></Route>
+          <Route path="/about" element={<About />}></Route>
+        </Routes>
+      </Suspense>
     </Context.Provider>
 
   </>

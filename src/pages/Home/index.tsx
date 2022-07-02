@@ -66,9 +66,16 @@ export default function Home() {
           <div className='text-left'>{sentence.content}</div>
           <div className='text-right'>——{sentence.trans}</div>
         </div>}
-        <div className='absolute bottom-full right-0 bg-white rounded-tl-3xl   rounded-bl-3xl'>
+        {state?.userInfo?.login &&
+          <div className='absolute bottom-full left-0 bg-white rounded-3xl'>
+
+          </div>}
+        <div className='flex items-center absolute bottom-full right-0 bg-white rounded-tl-3xl rounded-bl-3xl whitespace-nowrap'>
           {state?.userInfo?.login
-            ? <span onClick={logout}><IRun width="32" stroke='#000' /></span>
+            ? <>
+              <img src={state?.userInfo?.avatar_url} className="w-7 h-7 rounded-3xl border-2" alt="" />
+              <span onClick={logout}><IRun width="32" stroke='#000' /></span>
+            </>
             : <span onClick={login}><IGithub width="32" stroke='#000' /></span>
           }
         </div>
