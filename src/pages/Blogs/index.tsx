@@ -78,7 +78,7 @@ export default function Blogs() {
     blogs = res.data.data.repository.issues.edges.map((blog: any) => {
       var obj = {
         title: '',
-        img: 'https://cdn.jsdelivr.net/gh/huaasto/empty@master/public/2022_06_19/pic1655629880400553.jpg'
+        img: 'https://cdn.jsdelivr.net/gh/huaasto/empty@master/public/2022_06_14/pic1655169105262946.jpg'
       }
       try {
         obj = JSON.parse(blog.node.title)
@@ -106,7 +106,7 @@ export default function Blogs() {
       {
         datas.map((blog, i) => <Link to={"/blogs/" + blog.number} key={blog.id} className="block w-full p-2">
           <div className="relative flex h-40 overflow-hidden rounded-2xl flex-wrap sm:flex-nowrap">
-            {<div className={'flex-1 basis-full sm:flex-shrink-0 sm:basis-7/12 h-full bg-center bg-cover' + (i % 2 ? ' md:order-1' : '')} style={{ backgroundImage: `url("${blog.img || 'https://cdn.jsdelivr.net/gh/huaasto/empty@master/public/2022_06_19/pic1655629880400553.jpg'}")` }}></div>}
+            {<div className={'flex-1 basis-full sm:flex-shrink-0 sm:basis-7/12 h-full bg-center bg-cover' + (i % 2 ? ' md:order-1' : '')} style={{ backgroundImage: `url("${blog.img || 'https://cdn.jsdelivr.net/gh/huaasto/empty@master/public/2022_06_14/pic1655169105262946.jpg'}")` }}></div>}
             <div className='absolute left-0 right-0 sm:static flex-1 basis-full h-full p-2 overflow-hidden bg-black bg-opacity-25 sm:bg-transparent text-white sm:text-inherit flex flex-col'>
               <div className=' flex-shrink-0'>
                 {state?.userInfo?.login === "huaasto" && <span className=' mx-3 stroke-current' onClick={(e) => editBlog(e, blog)}>
