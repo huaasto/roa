@@ -261,12 +261,18 @@ export default function Images() {
     setCurrentImgs([...(isPublic ? pubDatesImages : datesImages)[date]])
     setShowBg(true)
   }
+  const [picLoad, setPicLoad] = useState(false)
   useEffect(() => {
-    if (isPublic || !datesImages[currentDate] || datesImages[currentDate][currentInd].content) return
+    setPicLoad(true)
+    if (isPublic || !datesImages[currentDate] || datesImages[currentDate][currentInd].content) {
+      setPicLoad(false)
+      return
+    }
     queryOneImgs(datesImages, currentDate, datesImages[currentDate][currentInd].name, currentInd).then(res => {
       const realImgs = JSON.parse(JSON.stringify(datesImages));
       setDatesImages(realImgs)
       setCurrentImgs(realImgs[currentDate])
+      setPicLoad(false)
     })
   }, [isPublic, currentInd, currentDate, datesImages])
   const copyLink = (img: Date) => {
@@ -367,6 +373,7 @@ export default function Images() {
         <img src={currentImgs[currentInd].content || currentImgs[currentInd].download_url} className="max-h-full max-w-full" alt="" />
         <div className="fixed left-4 top-1/2 bottom-1/2 text-white m-auto text-3xl cursor-pointer min-h-fit min-w-fit p-2 bg-black rounded-md" onClick={() => setCurrentInd(currentInd !== 0 ? currentInd - 1 : currentImgs.length - 1)}>&lt;</div>
         <div className="fixed right-4 top-1/2 bottom-1/2 text-white m-auto text-3xl cursor-pointer  min-h-fit min-w-fit p-2 bg-black rounded-md" onClick={() => setCurrentInd(currentInd !== currentImgs.length - 1 ? currentInd + 1 : 0)}>&gt;</div>
+        {picLoad && <div className=" fixed right-0 bottom-0 px-5 py-1 bg-black text-white">Loading... ...</div>}
       </div>}
     </>
   )
