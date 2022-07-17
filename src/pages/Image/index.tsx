@@ -249,8 +249,8 @@ export default function Images() {
 
     setShowBg(false)
     const imgs = JSON.parse(JSON.stringify((isPublic ? pubDatesImages : datesImages)))
-    imgs[date].splice(currentInd, 1)
-      (isPublic ? setPubDatesImages : setDatesImages)(imgs)
+    imgs[date].splice(currentInd, 1);
+    (isPublic ? setPubDatesImages : setDatesImages)(imgs)
     alert("删除成功")
   }
   const parseImg = (pic: Date) => {
@@ -265,17 +265,17 @@ export default function Images() {
   const [picLoad, setPicLoad] = useState(false)
   useEffect(() => {
     setPicLoad(true)
-    if (isPublic || !datesImages[currentDate] || datesImages[currentDate][currentInd].content) {
+    if (isPublic || !(isPublic ? pubDatesImages : datesImages)[currentDate] || (isPublic ? pubDatesImages : datesImages)[currentDate][currentInd].content) {
       setPicLoad(false)
       return
     }
-    queryOneImgs(datesImages, currentDate, datesImages[currentDate][currentInd].name, currentInd).then(res => {
-      const realImgs = JSON.parse(JSON.stringify(datesImages));
-      setDatesImages(realImgs)
+    queryOneImgs((isPublic ? pubDatesImages : datesImages), currentDate, (isPublic ? pubDatesImages : datesImages)[currentDate][currentInd].name, currentInd).then(res => {
+      const realImgs = JSON.parse(JSON.stringify((isPublic ? pubDatesImages : datesImages)));
+      (isPublic ? setPubDatesImages : setDatesImages)(realImgs)
       setCurrentImgs(realImgs[currentDate])
       setPicLoad(false)
     })
-  }, [isPublic, currentInd, currentDate, datesImages])
+  }, [isPublic, currentInd, currentDate, datesImages, pubDatesImages])
   const copyLink = (img: Date) => {
     var textareaC = document.createElement('textarea');
     textareaC.setAttribute('readonly', 'readonly'); //设置只读属性防止手机上弹出软键盘
