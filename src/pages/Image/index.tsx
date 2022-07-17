@@ -158,7 +158,7 @@ export default function Images() {
 
   const queryOneImgs = async (imgs: DatesObj, date: string, name: string, i: number) => {
     const res = await githubQuery({
-      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + name,
+      url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public/" : "https://api.github.com/repos/huaasto/empty/contents/pro/") + date + '/' + name,
       method: "GET",
     })
     imgs[date][i].proUrl = res.data.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master')
