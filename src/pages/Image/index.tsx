@@ -298,7 +298,6 @@ export default function Images() {
       method: "GET",
     }).then(res => {
       const data = JSON.parse(JSON.stringify(datesImages))
-      console.log(res, data, currentDate)
       data[currentDate] = res.data.reverse().map((date: any, i: number) => Object.assign(data[currentDate][i], { proUrl: date.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master') }))
       setDatesImages(data)
       setCurrentImgs(data[currentDate])
@@ -318,7 +317,7 @@ export default function Images() {
         </div>
         <button className="absolute bottom-3 right-3 bg-black text-white px-4" disabled={loading} onClick={startUpload}>Upload-{current}/{total}</button>
       </div>
-      {state?.userInfo?.login === "huaasto" && <div className="text-right">
+      {state?.userInfo?.login === "huaasto" && <div className="text-center">
         <button className={"py-1 px-3 border border-black" + (isPublic ? ' bg-black text-white' : '')} onClick={() => setIsPublic(true)}>公共</button>
         <button className={"py-1 px-3 border border-black" + (isPublic ? '' : ' bg-black text-white')} onClick={() => setIsPublic(false)}>私有</button>
       </div>}
