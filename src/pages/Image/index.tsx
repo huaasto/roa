@@ -42,7 +42,9 @@ export default function Images() {
   const [miniFiles, setMiniFiles] = useState<(File & { url: string; })[]>([])
   // const [currentDate, setCurrentDate] = useState('')
   const [imgDates, setImgDates] = useState<Date[]>([])
+  const [pubImgDates, setPubImgDates] = useState<Date[]>([])
   const [datesImages, setDatesImages] = useState<DatesObj>({})
+  const [pubDatesImages, setPubDatesImages] = useState<DatesObj>({})
   function myCompressor(file: File, option: CompressorOption) {
     return new Promise(res => {
       new Compressor(
@@ -158,9 +160,9 @@ export default function Images() {
       url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + date + '/' + name,
       method: "GET",
     })
-    imgs[date][i].content = res.data.content ? 'data:image/' + res.data.name.split('.').reverse()[0] + ';base64,' + res.data.content : ''
-    imgs[date][i].proSha = res.data.sha
     imgs[date][i].proUrl = res.data.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master')
+    imgs[date][i].content = res.data.content ? 'data:image/' + res.data.name.split('.').reverse()[0] + ';base64,' + res.data.content : imgs[date][i].proUrl
+    imgs[date][i].proSha = res.data.sha
     return imgs[date][i]
   }
 
@@ -169,33 +171,33 @@ export default function Images() {
       url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public/" : "https://api.github.com/repos/huaasto/empty/contents/mini/") + dates,
       method: "GET",
     })
-    const imgs = { ...datesImages }
+    const imgs = { ...(isPublic ? pubDatesImages : datesImages) }
     const imgData = res.data.map((img: Date, i: number) => Object.assign(imgs[dates]?.[imgs[dates].length - i - 1] || {}, img, {
       pic_url: img.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master'),
     })
     ).reverse()
-    imgs[dates] = imgData
-    setDatesImages(imgs)
-    isPublic || Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' || img.proUrl ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
-      const realImgs = JSON.parse(JSON.stringify(imgs))
-      setDatesImages(realImgs)
-    })
-  }, [datesImages, isPublic])
+    imgs[dates] = imgData;
+    (isPublic ? setPubDatesImages : setDatesImages)(imgs)
+    // isPublic || Promise.allSettled(imgs[dates].map((img, i) => img?.name?.split('.').reverse()[0] === 'gif' || img.proUrl ? Promise.resolve() : queryOneImgs(imgs, dates, img.name, i))).then(res => {
+    //   const realImgs = JSON.parse(JSON.stringify(imgs));
+    //   (isPublic ? setPubDatesImages : setDatesImages)(realImgs)
+    // })
+  }, [datesImages, isPublic, pubDatesImages])
 
   const queryDates = async () => {
     const res = await githubQuery({
       url: isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public" : "https://api.github.com/repos/huaasto/empty/contents/mini",
       method: "GET",
-    })
-    setImgDates(res.data.map((date: Object, i: number) => Object.assign(date, { fold: imgDates[i]?.fold || true })).reverse())
+    });
+    (isPublic ? setPubImgDates : setImgDates)(res.data.reverse().map((date: Object, i: number) => Object.assign(date, { fold: typeof (isPublic ? pubImgDates : imgDates)[i]?.fold === 'boolean' ? (isPublic ? pubImgDates : imgDates)[i]?.fold : true })))
   }
   const toggleFold = async (i: number) => {
-    const dates = [...imgDates]
+    const dates = [...(isPublic ? pubImgDates : imgDates)]
     dates[i].fold = !dates[i].fold
-    if (!dates[i].fold && !datesImages[dates[i].name]) {
+    if (!dates[i].fold && !(isPublic ? pubDatesImages : datesImages)[dates[i].name]) {
       queryOneDayImgs(dates[i].name)
-    }
-    setImgDates(dates)
+    };
+    (isPublic ? setPubImgDates : setImgDates)(dates)
   }
 
   const startUpload = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -245,9 +247,9 @@ export default function Images() {
     }
 
     setShowBg(false)
-    const imgs = JSON.parse(JSON.stringify(datesImages))
+    const imgs = JSON.parse(JSON.stringify((isPublic ? pubDatesImages : datesImages)))
     imgs[date].splice(currentInd, 1)
-    setDatesImages(imgs)
+      (isPublic ? setPubDatesImages : setDatesImages)(imgs)
     alert("删除成功")
   }
   const parseImg = (pic: Date) => {
@@ -256,9 +258,17 @@ export default function Images() {
   const queryCurrentImgs = (date: string, i: number) => {
     setCurrentInd(i)
     setCurrentDate(date)
-    setCurrentImgs([...datesImages[date]])
+    setCurrentImgs([...(isPublic ? pubDatesImages : datesImages)[date]])
     setShowBg(true)
   }
+  useEffect(() => {
+    if (isPublic || !datesImages[currentDate] || datesImages[currentDate][currentInd].content) return
+    queryOneImgs(datesImages, currentDate, datesImages[currentDate][currentInd].name, currentInd).then(res => {
+      const realImgs = JSON.parse(JSON.stringify(datesImages));
+      setDatesImages(realImgs)
+      setCurrentImgs(realImgs[currentDate])
+    })
+  }, [isPublic, currentInd, currentDate, datesImages])
   const copyLink = (img: Date) => {
     var textareaC = document.createElement('textarea');
     textareaC.setAttribute('readonly', 'readonly'); //设置只读属性防止手机上弹出软键盘
@@ -271,9 +281,23 @@ export default function Images() {
     return res;
   }
   useEffect(() => {
-    queryDates()
-    setDatesImages({})
+    queryDates();
+    // (isPublic ? setPubDatesImages : setDatesImages)({})
   }, [isPublic])
+  useEffect(() => {
+    if (!showBg || isPublic || datesImages[currentDate]?.[0].proUrl) return
+    githubQuery({
+      url: "https://api.github.com/repos/huaasto/empty/contents/pro/" + currentDate,
+      method: "GET",
+    }).then(res => {
+      const data = JSON.parse(JSON.stringify(datesImages))
+      console.log(res, data, currentDate)
+      data[currentDate] = res.data.reverse().map((date: any, i: number) => Object.assign(data[currentDate][i], { proUrl: date.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master') }))
+      setDatesImages(data)
+      setCurrentImgs(data[currentDate])
+
+    })
+  }, [showBg, isPublic, currentDate, datesImages])
   return (
     <>
       <div className={"border-2 border-gray-600 border-dashed max-w-screen-md px-3 py-6 mx-auto my-4 rounded text-center relative" + (loading ? ' disabled' : '')} onClick={() => fileRef.current?.click()}>
@@ -292,7 +316,25 @@ export default function Images() {
         <button className={"py-1 px-3 border border-black" + (isPublic ? '' : ' bg-black text-white')} onClick={() => setIsPublic(false)}>私有</button>
       </div>}
       <input ref={fileRef} type="file" multiple accept="image/*" disabled={loading} className="hidden" onChange={queryImages} />
-      <div className=" max-w-6xl m-auto overflow-x-hidden">
+      <div className={"max-w-6xl m-auto overflow-x-hidden" + (isPublic ? '' : ' hidden')}>
+        {pubImgDates.map((date, i) => <div key={date.sha} className="my-2">
+          <div>
+            <div className={"relative date-davider" + (i % 2 ? " text-right  border-l-stone-300 border-l-2" : ' border-r-stone-300 border-r-2')}>
+              <span className="inline-block bg-black text-white px-5 py-2 cursor-pointer"
+                onClick={(e) => toggleFold(i)}>
+                {date.name}
+              </span>
+            </div>
+            {<div className={date.fold ? " hidden" : " block"}>
+              {pubDatesImages[date.name]?.map((img, j) => <div key={'pp_' + j} className="inline-block h-20 m-2 relative">
+                <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={parseImg(img)} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
+                {/* {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>} */}
+              </div>)}
+            </div>}
+          </div>
+        </div>)}
+      </div>
+      <div className={"max-w-6xl m-auto overflow-x-hidden" + (isPublic ? ' hidden' : '')}>
         {imgDates.map((date, i) => <div key={date.sha} className="my-2">
           <div>
             <div className={"relative date-davider" + (i % 2 ? " text-right  border-l-stone-300 border-l-2" : ' border-r-stone-300 border-r-2')}>
@@ -303,7 +345,7 @@ export default function Images() {
             </div>
             {<div className={date.fold ? " hidden" : " block"}>
               {datesImages[date.name]?.map((img, j) => <div key={'pp_' + j} className="inline-block h-20 m-2 relative">
-                <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={parseImg(img)} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
+                <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={img.content || img.download_url} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
                 {/* {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>} */}
               </div>)}
             </div>}
@@ -322,7 +364,7 @@ export default function Images() {
           </span>
         </div>
         <div className="fixed right-0 top-0 text-white p-2 text-3xl  cursor-pointer" onClick={() => setShowBg(false)}>×</div>
-        <img src={parseImg(currentImgs[currentInd])} className="max-h-full max-w-full" alt="" />
+        <img src={currentImgs[currentInd].content || currentImgs[currentInd].download_url} className="max-h-full max-w-full" alt="" />
         <div className="fixed left-4 top-1/2 bottom-1/2 text-white m-auto text-3xl cursor-pointer min-h-fit min-w-fit p-2 bg-black rounded-md" onClick={() => setCurrentInd(currentInd !== 0 ? currentInd - 1 : currentImgs.length - 1)}>&lt;</div>
         <div className="fixed right-4 top-1/2 bottom-1/2 text-white m-auto text-3xl cursor-pointer  min-h-fit min-w-fit p-2 bg-black rounded-md" onClick={() => setCurrentInd(currentInd !== currentImgs.length - 1 ? currentInd + 1 : 0)}>&gt;</div>
       </div>}
