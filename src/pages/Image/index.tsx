@@ -265,7 +265,7 @@ export default function Images() {
   const [picLoad, setPicLoad] = useState(false)
   useEffect(() => {
     setPicLoad(true)
-    if (isPublic || !(isPublic ? pubDatesImages : datesImages)[currentDate] || (isPublic ? pubDatesImages : datesImages)[currentDate][currentInd].content) {
+    if (!(isPublic ? pubDatesImages : datesImages)[currentDate] || (isPublic ? pubDatesImages : datesImages)[currentDate][currentInd].content) {
       setPicLoad(false)
       return
     }
