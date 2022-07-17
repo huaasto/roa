@@ -4,6 +4,7 @@ import Compressor from 'compressorjs';
 import { Format, githubQuery, isMobile } from "../../utils/common";
 import "./index.css"
 import { Context } from "../../content";
+import ImgWrap from "./ImgWrap";
 
 type CompressorOption = {
   quality: number,
@@ -331,11 +332,16 @@ export default function Images() {
                 {date.name}
               </span>
             </div>
-            {<div className={date.fold ? " hidden" : " block"}>
-              {pubDatesImages[date.name]?.map((img, j) => <div key={'pp_' + j} className="inline-block h-20 m-2 relative">
-                <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={parseImg(img)} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
-                {/* {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>} */}
-              </div>)}
+            {<div className={'text-center' + (date.fold ? " hidden" : " block")}>
+              {pubDatesImages[date.name]?.map((img, j) => <ImgWrap
+                key={'pp_' + j} url={img.content || img.download_url || ''}
+                picClick={() => queryCurrentImgs(date.name, j)}
+              />
+                // <div key={'pp_' + j} className="inline-block h-20 m-2 relative">
+                //   <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={parseImg(img)} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
+                //   {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>}
+                // </div>
+              )}
             </div>}
           </div>
         </div>)}
@@ -349,11 +355,16 @@ export default function Images() {
                 {date.name}
               </span>
             </div>
-            {<div className={date.fold ? " hidden" : " block"}>
-              {datesImages[date.name]?.map((img, j) => <div key={'pp_' + j} className="inline-block h-20 m-2 relative">
+            {<div className={"text-center" + (date.fold ? " hidden" : " block")}>
+              {datesImages[date.name]?.map((img, j) => <ImgWrap
+                key={'pp_' + j} url={img.content || img.download_url || ''}
+                picClick={() => queryCurrentImgs(date.name, j)}
+              />
+              )}
+              {/* {datesImages[date.name]?.map((img, j) => <div key={'pp_' + j} className="inline-block h-20 m-2 relative">
                 <img className={"h-full shadow-black" + (img.content ? " shadow-md" : "")} src={img.content || img.download_url} alt="" onClick={() => queryCurrentImgs(date.name, j)} />
-                {/* {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>} */}
-              </div>)}
+                {!img.content && <div className="absolute right-0 top-0 bg-black text-white p-1 cursor-pointer" onClick={(e) => removeCurrentPic(e, date.name, img)}>×</div>}
+              </div>)} */}
             </div>}
           </div>
         </div>)}
