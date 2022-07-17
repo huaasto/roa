@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from 'react'
+import React, { MouseEventHandler, useState } from 'react'
 
 type TPicItem = {
   url: string,
@@ -8,9 +8,13 @@ type TPicItem = {
 }
 
 export default function ImgWrap({ url, className, picClick, ...args }: TPicItem) {
+  const [realUrl, setRealUrl] = useState(url)
+  const showError = () => {
+    setRealUrl('https://i.postimg.cc/zvQNCY13/d4p259-Bwqj.png')
+  }
   return (
     <div className={"inline-block h-36 w-18 m-2 relative bg-gray-600" + (className || '')} {...args}>
-      <img className="h-full w-full shadow-black object-cover" src={url} alt="" onClick={picClick} />
+      <img className="h-full w-full shadow-black object-cover" src={realUrl} alt="" onError={() => showError} onClick={picClick} />
     </div>
   )
 }
