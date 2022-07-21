@@ -30,27 +30,29 @@
   width: 360px;
   align-self: flex-start;
 }
-.right-line::before, .right-line::after{
-  content: '';
-  position: absolute;
-  top: 20px;
-  bottom: 20px;
-  width: 3px;
-  background-color: #999;
-  z-index: -1;
-}
-.right-line::before{
-  left: 20px;
-}
-.right-line::after{
-  right: 20px;
-}
 
 
 
 .comment-item-wrap{
+  position: relative;
   background-color: #fff;
 }
+.comment-item-wrap::before, .comment-item-wrap::after{
+  content: '';
+  position: absolute;
+  top: -20px;
+  bottom: 98%;
+  width: 3px;
+  background-color: #999;
+  z-index: -1;
+}
+.comment-item-wrap::before{
+  left: 20px;
+}
+.comment-item-wrap::after{
+  right: 20px;
+}
+
 
 .comment-login-avatar{
   display: inline-block;

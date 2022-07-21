@@ -161,7 +161,8 @@ export default function Images() {
       url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public/" : "https://api.github.com/repos/huaasto/empty/contents/pro/") + date + '/' + name,
       method: "GET",
     })
-    imgs[date][i].proUrl = res.data.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master')
+    imgs[date][i].proUrl = res.data.download_url
+    // ?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master')
     imgs[date][i].content = res.data.content ? 'data:image/' + res.data.name.split('.').reverse()[0] + ';base64,' + res.data.content : imgs[date][i].proUrl
     imgs[date][i].proSha = res.data.sha
     return imgs[date][i]
@@ -174,7 +175,8 @@ export default function Images() {
     })
     const imgs = { ...(isPublic ? pubDatesImages : datesImages) }
     const imgData = res.data.map((img: Date, i: number) => Object.assign(imgs[dates]?.[imgs[dates].length - i - 1] || {}, img, {
-      pic_url: img.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master'),
+      pic_url: img.download_url
+      // ?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master'),
     })
     ).reverse()
     imgs[dates] = imgData;
@@ -298,7 +300,10 @@ export default function Images() {
       method: "GET",
     }).then(res => {
       const data = JSON.parse(JSON.stringify(datesImages))
-      data[currentDate] = res.data.reverse().map((date: any, i: number) => Object.assign(data[currentDate][i], { proUrl: date.download_url?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master') }))
+      data[currentDate] = res.data.reverse().map((date: any, i: number) => Object.assign(data[currentDate][i], {
+        proUrl: date.download_url
+        // ?.replace("https://raw.githubusercontent.com/huaasto/empty/main", 'https://cdn.jsdelivr.net/gh/huaasto/empty@master') 
+      }))
       setDatesImages(data)
       setCurrentImgs(data[currentDate])
 

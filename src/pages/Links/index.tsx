@@ -124,7 +124,7 @@ export default function Links() {
         datas.map(link => <div key={link.sha} className="w-full max-w-full overflow-hidden sm:flex h-fit border-2 border-gray-600 border-dashed p-3 m-4 rounded text-center box-border flex-1 sm:basis-2/5 min-w-300 items-center bg-gray-100">
           <a href={link.link}>
             {!link.img
-              ? <div className='sm:max-h-14 max-w-full h-full p-3 basis-auto flex-grow-0 inline-block'>
+              ? <div className='sm:max-h-14 max-w-full h-full p-3 basis-auto flex-grow-0 inline-block min-w-100'>
                 <ISearch width="32" stroke="#000" />
               </div>
               : <div className='flex justify-center items-center min-w-100'>
