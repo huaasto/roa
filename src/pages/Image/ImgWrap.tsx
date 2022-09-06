@@ -10,11 +10,12 @@ type TPicItem = {
 export default function ImgWrap({ url, className, picClick, ...args }: TPicItem) {
   const [realUrl, setRealUrl] = useState(url)
   const showError = () => {
-    setRealUrl('https://i.postimg.cc/zvQNCY13/d4p259-Bwqj.png')
+
+    setRealUrl(url.match('empty.t-n.top') ? 'https://i.postimg.cc/zvQNCY13/d4p259-Bwqj.png' : url.replace('https://raw.githubusercontent.com/huaasto/empty/main', 'https://empty.t-n.top'))
   }
   useEffect(() => {
     setRealUrl(url
-      .replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || ''
+      .replaceAll("https://raw.githubusercontent.com/huaasto/empty/main", "https://cdn.jsdelivr.net/gh/huaasto/empty@master") || ''
       // .replace('https://raw.githubusercontent.com/huaasto/empty/main', 'https://empty.t-n.top')
     )
   }, [url])
