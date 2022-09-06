@@ -13,7 +13,9 @@ export default function ImgWrap({ url, className, picClick, ...args }: TPicItem)
     setRealUrl('https://i.postimg.cc/zvQNCY13/d4p259-Bwqj.png')
   }
   useEffect(() => {
-    setRealUrl(url.replace('https://raw.githubusercontent.com/huaasto/empty/main', 'https://empty.t-n.top'))
+    setRealUrl(url
+      // .replace('https://raw.githubusercontent.com/huaasto/empty/main', 'https://empty.t-n.top')
+    )
   }, [url])
   return (
     <div className={"inline-block h-36 w-18 m-2 relative bg-gray-600" + (className || '')} {...args}>

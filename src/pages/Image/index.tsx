@@ -106,7 +106,7 @@ export default function Images() {
         if (typeof ev?.target?.result !== 'string') return
         var dataURL = ev.target.result.split(',')[1] //获得文件读取成功后的DataURL,也就是base64编码
         const data = await githubQuery({
-          url: (isPublic ? 'https://api.github.com/repos/huaasto/empty/contents/pub_lic/' : "https://api.github.com/repos/huaasto/empty/contents/pro/") + par.path + '/' + par.name,
+          url: (isPublic ? 'https://api.github.com/repos/huaasto/empty/contents/public/' : "https://api.github.com/repos/huaasto/empty/contents/pro/") + par.path + '/' + par.name,
           method: "PUT",
           data: {
             content: dataURL,
@@ -158,7 +158,7 @@ export default function Images() {
 
   const queryOneImgs = async (imgs: DatesObj, date: string, name: string, i: number) => {
     const res = await githubQuery({
-      url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/pub_lic/" : "https://api.github.com/repos/huaasto/empty/contents/pro/") + date + '/' + name,
+      url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public/" : "https://api.github.com/repos/huaasto/empty/contents/pro/") + date + '/' + name,
       method: "GET",
     })
     imgs[date][i].proUrl = res.data.download_url
@@ -170,7 +170,7 @@ export default function Images() {
 
   const queryOneDayImgs = useCallback(async (dates: string) => {
     const res = await githubQuery({
-      url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/pub_lic/" : "https://api.github.com/repos/huaasto/empty/contents/mini/") + dates,
+      url: (isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public/" : "https://api.github.com/repos/huaasto/empty/contents/mini/") + dates,
       method: "GET",
     })
     const imgs = { ...(isPublic ? pubDatesImages : datesImages) }
@@ -189,7 +189,7 @@ export default function Images() {
 
   const queryDates = async () => {
     const res = await githubQuery({
-      url: isPublic ? "https://api.github.com/repos/huaasto/empty/contents/pub_lic" : "https://api.github.com/repos/huaasto/empty/contents/mini",
+      url: isPublic ? "https://api.github.com/repos/huaasto/empty/contents/public" : "https://api.github.com/repos/huaasto/empty/contents/mini",
       method: "GET",
     });
     (isPublic ? setPubImgDates : setImgDates)(res.data.reverse().map((date: Object, i: number) => Object.assign(date, { fold: typeof (isPublic ? pubImgDates : imgDates)[i]?.fold === 'boolean' ? (isPublic ? pubImgDates : imgDates)[i]?.fold : true })))
@@ -227,7 +227,7 @@ export default function Images() {
   const removeCurrentPic = async (e: any, date: string, img: Date) => {
     e.stopPropagation()
     const res = githubQuery({
-      url: (isPublic ? 'https://api.github.com/repos/huaasto/empty/contents/pub_lic/' : "https://api.github.com/repos/huaasto/empty/contents/mini/") + date + '/' + img.name,
+      url: (isPublic ? 'https://api.github.com/repos/huaasto/empty/contents/public/' : "https://api.github.com/repos/huaasto/empty/contents/mini/") + date + '/' + img.name,
       method: "DELETE",
       data: {
         sha: img.sha,
