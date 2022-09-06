@@ -14,6 +14,7 @@ export default function ImgWrap({ url, className, picClick, ...args }: TPicItem)
   }
   useEffect(() => {
     setRealUrl(url
+      .replaceAll("https://raw.githubusercontent.com/huaasto/blogPics/main", "https://cdn.jsdelivr.net/gh/huaasto/blogPics@master") || ''
       // .replace('https://raw.githubusercontent.com/huaasto/empty/main', 'https://empty.t-n.top')
     )
   }, [url])
